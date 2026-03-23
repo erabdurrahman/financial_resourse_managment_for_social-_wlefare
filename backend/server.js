@@ -2,9 +2,29 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
+
+// ─── Rate Limiters ────────────────────────────────────────────────────────────
+// Strict limit for auth endpoints (login/register) to prevent brute-force attacks
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  max: 20,                    // 20 attempts per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests from this IP, please try again later.' }
+});
+
+// General limit for all other API routes
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  max: 200,                   // 200 requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests from this IP, please try again later.' }
+});
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors());
@@ -14,10 +34,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
-app.use('/api/auth',         require('./routes/auth'));
-app.use('/api/donations',    require('./routes/donations'));
-app.use('/api/applications', require('./routes/applications'));
-app.use('/api/admin',        require('./routes/admin'));
+app.use('/api/auth',         authLimiter, require('./routes/auth'));
+app.use('/api/donations',    apiLimiter,  require('./routes/donations'));
+app.use('/api/applications', apiLimiter,  require('./routes/applications'));
+app.use('/api/admin',        apiLimiter,  require('./routes/admin'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
