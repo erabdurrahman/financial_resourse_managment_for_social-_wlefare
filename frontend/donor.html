@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donor Dashboard – FinWelfare</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="dashboard-page">
+
+  <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">💰</span>
+      <span class="brand-name">FinWelfare</span>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">D</div>
+      <div>
+        <div class="user-name" id="sidebarName">Donor</div>
+        <div class="user-role">Donor Account</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard" onclick="showSection('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-section="donate" onclick="showSection('donate', this)">
+        <span class="nav-icon">💝</span> Donate Now
+      </a>
+      <a href="#" class="nav-item" data-section="history" onclick="showSection('history', this)">
+        <span class="nav-icon">📜</span> My Donations
+      </a>
+      <a href="#" class="nav-item nav-logout" onclick="logout()">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <main class="main-content">
+
+    <header class="top-header">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <h2 class="page-title" id="pageTitle">Dashboard</h2>
+      <div class="header-right">
+        <div class="header-avatar" id="headerAvatar">D</div>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD SECTION ── -->
+    <section class="content-section active" id="section-dashboard">
+      <div class="welcome-banner">
+        <h2>Welcome back, <span id="welcomeName">Donor</span>! 👋</h2>
+        <p>Your generosity is making a real difference in people's lives.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon stat-green">💚</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total">$0</div>
+            <div class="stat-label">Total Donated</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-blue">🔢</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-count">0</div>
+            <div class="stat-label">Number of Donations</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-purple">📈</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-avg">$0</div>
+            <div class="stat-label">Average Donation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent donations preview -->
+      <div class="card mt-2">
+        <div class="card-header">
+          <h3>📜 Recent Donations</h3>
+          <button class="btn-sm" onclick="showSection('history', document.querySelector('[data-section=history]'))">View All</button>
+        </div>
+        <div id="dashDonationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DONATE SECTION ── -->
+    <section class="content-section" id="section-donate">
+      <div class="section-header">
+        <h2>Make a Donation</h2>
+        <p>Your contribution goes directly to helping those in need</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-inner">
+          <!-- Impact info panel -->
+          <div class="impact-panel">
+            <h3>💡 Your Impact</h3>
+            <ul class="impact-list">
+              <li>🏠 <strong>$500</strong> can cover one month's rent for a family</li>
+              <li>🏥 <strong>$1,000</strong> can help with basic medical expenses</li>
+              <li>📚 <strong>$200</strong> provides school supplies for 3 children</li>
+              <li>🍽️ <strong>$100</strong> provides meals for a family for a month</li>
+            </ul>
+          </div>
+
+          <!-- Donation form -->
+          <form id="donationForm" onsubmit="handleDonate(event)">
+            <div class="form-group">
+              <label>Donation Amount (USD)</label>
+              <div class="amount-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input type="number" id="donationAmount" placeholder="0.00" min="1" step="0.01" required />
+              </div>
+              <!-- Quick amount buttons -->
+              <div class="quick-amounts">
+                <button type="button" class="quick-btn" onclick="setAmount(100)">$100</button>
+                <button type="button" class="quick-btn" onclick="setAmount(500)">$500</button>
+                <button type="button" class="quick-btn" onclick="setAmount(1000)">$1,000</button>
+                <button type="button" class="quick-btn" onclick="setAmount(5000)">$5,000</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Message (optional)</label>
+              <textarea id="donationMessage" rows="4" placeholder="Share why you're donating or a message of hope…"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="donateBtn">
+              <span class="btn-text">💝 Donate Now</span>
+              <span class="spinner-sm"></span>
+            </button>
+            <div class="form-note">🔒 All transactions are secure and encrypted</div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── HISTORY SECTION ── -->
+    <section class="content-section" id="section-history">
+      <div class="section-header">
+        <h2>My Donation History</h2>
+        <p>A complete record of all your contributions</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>📜 All My Donations</h3>
+          <button class="btn-sm" onclick="loadDonations()">🔄 Refresh</button>
+        </div>
+        <div id="donationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/donor.js"></script>
+</body>
+</html>

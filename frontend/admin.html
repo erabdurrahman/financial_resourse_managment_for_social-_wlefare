@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – FinWelfare</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="dashboard-page">
+
+  <!-- ── Mobile overlay ── -->
+  <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">💰</span>
+      <span class="brand-name">FinWelfare</span>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div>
+        <div class="user-name" id="sidebarName">Admin</div>
+        <div class="user-role">Administrator</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard" onclick="showSection('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-section="applications" onclick="showSection('applications', this)">
+        <span class="nav-icon">📋</span> Applications
+        <span class="nav-badge" id="pendingBadge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-section="donations" onclick="showSection('donations', this)">
+        <span class="nav-icon">💸</span> Donations
+      </a>
+      <a href="#" class="nav-item" data-section="users" onclick="showSection('users', this)">
+        <span class="nav-icon">👥</span> Users
+      </a>
+      <a href="#" class="nav-item nav-logout" onclick="logout()">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <main class="main-content">
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <h2 class="page-title" id="pageTitle">Dashboard</h2>
+      <div class="header-right">
+        <span class="header-time" id="headerTime"></span>
+        <div class="header-avatar" id="headerAvatar">A</div>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD SECTION ── -->
+    <section class="content-section active" id="section-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon stat-blue">💰</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-donations">$0</div>
+            <div class="stat-label">Total Donations</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-yellow">⏳</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-pending">0</div>
+            <div class="stat-label">Pending Applications</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-green">✅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-approved">0</div>
+            <div class="stat-label">Approved Applications</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-purple">🏦</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-available">$0</div>
+            <div class="stat-label">Available Funds</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick overview table of top applications -->
+      <div class="card mt-2">
+        <div class="card-header">
+          <h3>🏆 Top Priority Applications</h3>
+          <button class="btn-sm" onclick="showSection('applications', document.querySelector('[data-section=applications]'))">View All</button>
+        </div>
+        <div id="dashApplicationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── APPLICATIONS SECTION ── -->
+    <section class="content-section" id="section-applications">
+      <div class="section-header">
+        <h2>Applications Management</h2>
+        <p>Review and process beneficiary assistance applications sorted by priority score</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>📋 All Applications</h3>
+          <button class="btn-sm" onclick="loadApplications()">🔄 Refresh</button>
+        </div>
+        <div id="applicationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DONATIONS SECTION ── -->
+    <section class="content-section" id="section-donations">
+      <div class="section-header">
+        <h2>Donations Overview</h2>
+        <p>All monetary contributions received from donors</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>💸 All Donations</h3>
+          <button class="btn-sm" onclick="loadDonations()">🔄 Refresh</button>
+        </div>
+        <div id="donationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── USERS SECTION ── -->
+    <section class="content-section" id="section-users">
+      <div class="section-header">
+        <h2>User Management</h2>
+        <p>All registered system users</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>👥 All Users</h3>
+          <button class="btn-sm" onclick="loadUsers()">🔄 Refresh</button>
+        </div>
+        <div id="usersTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Confirmation Modal ── -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <div class="modal-icon" id="modalIcon">❓</div>
+      <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+      <p class="modal-body" id="modalBody">Are you sure?</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn" id="modalConfirmBtn" onclick="modalConfirm()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast notification ── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
