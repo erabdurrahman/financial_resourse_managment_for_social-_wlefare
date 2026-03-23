@@ -165,11 +165,11 @@ async function handleDonate(e) {
 }
 
 // ── Quick amount selector ──────────────────────────────────────────────────
-function setAmount(value) {
+function setAmount(value, e) {
   document.getElementById('donationAmount').value = value;
   // Highlight active quick button
   document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (e && e.target) e.target.classList.add('active');
 }
 
 // ── Logout ─────────────────────────────────────────────────────────────────

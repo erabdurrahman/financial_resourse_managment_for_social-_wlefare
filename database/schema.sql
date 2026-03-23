@@ -26,7 +26,7 @@ CREATE TABLE donations (
 );
 
 -- Applications table: beneficiaries apply for financial assistance
--- priority_score = (10 - income_level) * 3 + emergency_level * 4 + need_score * 3 (max 70)
+-- priority_score = (10 - income_level) * 3 + emergency_level * 4 + need_score * 3 (max 97)
 CREATE TABLE applications (
   id INT AUTO_INCREMENT PRIMARY KEY,
   beneficiary_id INT NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE applications (
   income_level INT NOT NULL COMMENT '1-10 scale, 1=lowest income',
   emergency_level INT NOT NULL COMMENT '1-10 scale, 10=most urgent',
   need_score INT NOT NULL COMMENT '1-10 scale, 10=highest need',
-  priority_score INT NOT NULL COMMENT 'Calculated: (10-income)*3 + emergency*4 + need*3, max 70',
+  priority_score INT NOT NULL COMMENT 'Calculated: (10-income)*3 + emergency*4 + need*3, max 97',
   status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
   amount_allocated DECIMAL(10, 2) DEFAULT NULL,
   reviewed_by INT DEFAULT NULL,

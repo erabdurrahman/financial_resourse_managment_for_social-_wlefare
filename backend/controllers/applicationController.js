@@ -28,7 +28,7 @@ const applyForFunds = async (req, res) => {
       return res.status(400).json({ message: 'Amount requested must be positive' });
     }
 
-    // Calculate priority score (higher = more urgent / more deserving)
+    // Calculate priority score (higher = more urgent / more deserving), max 97
     const priority_score = (10 - inc) * 3 + emg * 4 + nds * 3;
 
     const [result] = await db.query(
