@@ -42,8 +42,8 @@ app.use('/api/admin',        apiLimiter,  require('./routes/admin'));
 // Health check endpoint
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
-// SPA catch-all: serve index.html for any non-API route
-app.get('*', (req, res) => {
+// SPA catch-all: serve index.html for any non-API route (rate-limited)
+app.get('*', apiLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
