@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beneficiary Dashboard – FinWelfare</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="dashboard-page">
+
+  <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">💰</span>
+      <span class="brand-name">FinWelfare</span>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">B</div>
+      <div>
+        <div class="user-name" id="sidebarName">Beneficiary</div>
+        <div class="user-role">Beneficiary Account</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard" onclick="showSection('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-section="apply" onclick="showSection('apply', this)">
+        <span class="nav-icon">📝</span> Apply for Aid
+      </a>
+      <a href="#" class="nav-item" data-section="applications" onclick="showSection('applications', this)">
+        <span class="nav-icon">📋</span> My Applications
+      </a>
+      <a href="#" class="nav-item nav-logout" onclick="logout()">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <main class="main-content">
+
+    <header class="top-header">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <h2 class="page-title" id="pageTitle">Dashboard</h2>
+      <div class="header-right">
+        <div class="header-avatar" id="headerAvatar">B</div>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD SECTION ── -->
+    <section class="content-section active" id="section-dashboard">
+      <div class="welcome-banner">
+        <h2>Welcome, <span id="welcomeName">Beneficiary</span>! 🤝</h2>
+        <p>We're here to help. Apply for financial assistance and track your applications.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon stat-blue">📋</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total Applications</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-green">✅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-approved">0</div>
+            <div class="stat-label">Approved</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-yellow">⏳</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-pending">0</div>
+            <div class="stat-label">Pending Review</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header">
+          <h3>📋 Recent Applications</h3>
+          <button class="btn-sm" onclick="showSection('applications', document.querySelector('[data-section=applications]'))">View All</button>
+        </div>
+        <div id="dashApplicationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── APPLY SECTION ── -->
+    <section class="content-section" id="section-apply">
+      <div class="section-header">
+        <h2>Apply for Financial Assistance</h2>
+        <p>Complete the form below. Your priority score is calculated automatically based on your situation.</p>
+      </div>
+
+      <div class="apply-grid">
+        <!-- Application form -->
+        <div class="form-card">
+          <form id="applyForm" onsubmit="handleApply(event)">
+            <div class="form-group">
+              <label>Application Title</label>
+              <input type="text" id="appTitle" placeholder="e.g., Medical Emergency Assistance" required />
+            </div>
+            <div class="form-group">
+              <label>Description of Need</label>
+              <textarea id="appDescription" rows="4" placeholder="Describe your situation and why you need financial assistance…" required></textarea>
+            </div>
+            <div class="form-group">
+              <label>Amount Requested (USD)</label>
+              <div class="amount-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input type="number" id="appAmount" placeholder="0.00" min="1" step="0.01" required />
+              </div>
+            </div>
+
+            <!-- Sliders -->
+            <div class="slider-section">
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label>Income Level</label>
+                  <span class="slider-value" id="incomeVal">5</span>
+                </div>
+                <input type="range" id="incomeLevel" min="1" max="10" value="5"
+                       oninput="updateSlider('incomeVal', this.value); calcPriority()" />
+                <div class="slider-hints"><span>Very Low (1)</span><span>Very High (10)</span></div>
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label>Emergency Level</label>
+                  <span class="slider-value" id="emergencyVal">5</span>
+                </div>
+                <input type="range" id="emergencyLevel" min="1" max="10" value="5"
+                       oninput="updateSlider('emergencyVal', this.value); calcPriority()" />
+                <div class="slider-hints"><span>Low Urgency (1)</span><span>Life Threatening (10)</span></div>
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label>Need Score</label>
+                  <span class="slider-value" id="needVal">5</span>
+                </div>
+                <input type="range" id="needScore" min="1" max="10" value="5"
+                       oninput="updateSlider('needVal', this.value); calcPriority()" />
+                <div class="slider-hints"><span>Minimal Need (1)</span><span>Critical Need (10)</span></div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="applyBtn">
+              <span class="btn-text">📝 Submit Application</span>
+              <span class="spinner-sm"></span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Priority score display -->
+        <div class="priority-panel">
+          <h3>Priority Score Calculator</h3>
+          <div class="priority-circle" id="priorityCircle">
+            <div class="priority-number" id="priorityScore">50</div>
+            <div class="priority-max">/ 97</div>
+          </div>
+          <div class="priority-label" id="priorityLabel">Medium Priority</div>
+          <div class="priority-breakdown">
+            <h4>Score Breakdown</h4>
+            <div class="breakdown-row">
+              <span>Income Factor</span>
+              <span id="bkIncome" class="breakdown-val">15</span>
+            </div>
+            <div class="breakdown-row">
+              <span>Emergency Factor</span>
+              <span id="bkEmergency" class="breakdown-val">20</span>
+            </div>
+            <div class="breakdown-row">
+              <span>Need Factor</span>
+              <span id="bkNeed" class="breakdown-val">15</span>
+            </div>
+            <div class="breakdown-row breakdown-total">
+              <span>Total Priority</span>
+              <span id="bkTotal" class="breakdown-val">50</span>
+            </div>
+          </div>
+          <p class="priority-formula">
+            <strong>Formula:</strong><br />
+            (10 − Income) × 3 + Emergency × 4 + Need × 3
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MY APPLICATIONS SECTION ── -->
+    <section class="content-section" id="section-applications">
+      <div class="section-header">
+        <h2>My Applications</h2>
+        <p>Track the status of all your submitted applications</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>📋 All My Applications</h3>
+          <button class="btn-sm" onclick="loadApplications()">🔄 Refresh</button>
+        </div>
+        <div id="applicationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/beneficiary.js"></script>
+</body>
+</html>
