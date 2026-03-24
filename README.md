@@ -4,6 +4,28 @@ A full-stack web application that manages financial resources for social welfare
 
 ---
 
+## 📸 Screenshots
+
+### Login & Register
+| Login | Register |
+|-------|----------|
+| ![Login page](docs/screenshots/login.png) | ![Register page](docs/screenshots/register.png) |
+
+### Admin Dashboard
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+### Donor Dashboard
+| Dashboard Overview | Donate Now |
+|--------------------|------------|
+| ![Donor Dashboard](docs/screenshots/donor-dashboard.png) | ![Donate Now](docs/screenshots/donor-donate.png) |
+
+### Beneficiary Dashboard
+| Dashboard Overview | Apply for Aid |
+|--------------------|---------------|
+| ![Beneficiary Dashboard](docs/screenshots/beneficiary-dashboard.png) | ![Apply for Aid](docs/screenshots/beneficiary-apply.png) |
+
+---
+
 ## ✨ Features
 
 ### 👤 Role-based Access
