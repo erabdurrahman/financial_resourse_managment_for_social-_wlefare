@@ -8,7 +8,7 @@ const token = localStorage.getItem('token');
 const user  = JSON.parse(localStorage.getItem('user') || 'null');
 
 if (!token || !user || user.role !== 'beneficiary') {
-  window.location.href = '/';
+  window.location.href = '/login.html';
 }
 
 // ── On page load ───────────────────────────────────────────────────────────
@@ -246,7 +246,7 @@ async function handleApply(e) {
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = '/';
+  window.location.href = '/login.html';
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
