@@ -7,7 +7,7 @@ require('dotenv').config();
 /**
  * register - creates a new user account
  * Body: { name, email, password, role }
- * Roles allowed: admin, donor, beneficiary
+ * Roles allowed: donor, beneficiary
  */
 const register = async (req, res) => {
   try {
@@ -18,9 +18,9 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const validRoles = ['admin', 'donor', 'beneficiary'];
+    const validRoles = ['donor', 'beneficiary'];
     if (!validRoles.includes(role)) {
-      return res.status(400).json({ message: 'Invalid role. Must be admin, donor, or beneficiary' });
+      return res.status(400).json({ message: 'Invalid role. Must be donor or beneficiary' });
     }
 
     // Check for duplicate email
