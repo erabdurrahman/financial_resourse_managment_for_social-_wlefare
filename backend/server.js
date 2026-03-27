@@ -5,6 +5,21 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// ─── Environment Validation ───────────────────────────────────────────────────
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ FATAL: JWT_SECRET environment variable is required in production.');
+    console.error('   Copy backend/.env.example to backend/.env and set a strong JWT_SECRET.');
+    process.exit(1);
+  }
+  // In development, generate a random secret per process so tokens are never predictable.
+  // Tokens will be invalidated on each server restart – acceptable for local development.
+  const crypto = require('crypto');
+  process.env.JWT_SECRET = crypto.randomBytes(32).toString('hex');
+  console.warn('⚠️  JWT_SECRET is not set in .env – using a random development secret (tokens reset on restart).');
+  console.warn('   Copy backend/.env.example to backend/.env and set a strong JWT_SECRET.');
+}
+
 const app = express();
 
 // ─── Environment Variable Checks ─────────────────────────────────────────────
@@ -65,8 +80,24 @@ app.use((err, req, res, next) => {
 
 // ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const db = require('./config/db');
+
+app.listen(PORT, async () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`   Frontend: http://localhost:${PORT}`);
   console.log(`   API:      http://localhost:${PORT}/api`);
+
+  // Verify database connection on startup so misconfiguration is caught early
+  try {
+    await db.query('SELECT 1');
+    console.log('✅ Database connection OK');
+  } catch (err) {
+    console.error('❌ Database connection FAILED:', err.message);
+    console.error('   Make sure MySQL is running and your .env DB_* variables are correct.');
+    if (process.env.NODE_ENV === 'production') {
+      console.error('   Exiting – cannot serve API requests without a database.');
+      process.exit(1);
+    }
+    console.warn('   Server will continue running in development mode, but API calls will fail until the database is available.');
+  }
 });
