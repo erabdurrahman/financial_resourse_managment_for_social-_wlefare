@@ -8,7 +8,7 @@ const token = localStorage.getItem('token');
 const user  = JSON.parse(localStorage.getItem('user') || 'null');
 
 if (!token || !user || user.role !== 'donor') {
-  window.location.href = '/';
+  window.location.href = '/login.html';
 }
 
 // ── On page load ───────────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ function setAmount(value, e) {
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = '/';
+  window.location.href = '/login.html';
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
