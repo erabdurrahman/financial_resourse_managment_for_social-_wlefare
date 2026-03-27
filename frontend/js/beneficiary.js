@@ -8,7 +8,7 @@ const token = localStorage.getItem('token');
 const user  = JSON.parse(localStorage.getItem('user') || 'null');
 
 if (!token || !user || user.role !== 'beneficiary') {
-  window.location.href = '/';
+  window.location.href = '/login.html';
 }
 
 // ── On page load ───────────────────────────────────────────────────────────
