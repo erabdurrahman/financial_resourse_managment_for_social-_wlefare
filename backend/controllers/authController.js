@@ -74,9 +74,10 @@ const login = async (req, res) => {
     }
 
     // Sign JWT with user payload, expires in 24 hours
+    const jwtSecret = process.env.JWT_SECRET || 'changeme_set_JWT_SECRET_in_env';
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
+      jwtSecret,
       { expiresIn: '24h' }
     );
 
