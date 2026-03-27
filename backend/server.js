@@ -2,6 +2,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
@@ -22,15 +24,39 @@ if (!process.env.JWT_SECRET) {
 
 const app = express();
 
-// ─── Environment Variable Checks ─────────────────────────────────────────────
-if (!process.env.JWT_SECRET) {
-  if (process.env.NODE_ENV === 'production') {
-    console.error('❌ FATAL: JWT_SECRET environment variable is not set. Refusing to start in production.');
-    process.exit(1);
-  } else {
-    console.warn('⚠️  WARNING: JWT_SECRET is not set. Using an insecure default for development. Set JWT_SECRET in your .env file before deploying.');
-  }
+// ─── Uploads Directory ────────────────────────────────────────────────────────
+const UPLOADS_DIR = path.join(__dirname, '../uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
+
+// ─── Multer Configuration (file uploads) ─────────────────────────────────────
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+  filename: (req, file, cb) => {
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${unique}${ext}`);
+  }
+});
+
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+const fileFilter = (req, file, cb) => {
+  if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only PDF, JPEG, PNG, and GIF files are allowed'), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }  // 5 MB per file
+});
+
+// Expose upload middleware for use in routes
+app.locals.upload = upload;
 
 // ─── Rate Limiters ────────────────────────────────────────────────────────────
 // Strict limit for auth endpoints (login/register) to prevent brute-force attacks
@@ -57,6 +83,9 @@ app.use(express.json());
 
 // Serve static frontend assets from the /frontend directory
 app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Serve uploaded files (restrict directory listing)
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth',         authLimiter, require('./routes/auth'));

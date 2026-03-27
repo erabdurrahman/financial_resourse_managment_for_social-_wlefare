@@ -1,47 +1,143 @@
 // Application Controller - beneficiaries apply for and track financial assistance
+const path = require('path');
 const db = require('../config/db');
 
 /**
+ * calculatePriorityScore - server-side priority calculation; users cannot influence this
+ * Factors:
+ *   income        : < $10k → +30, < $20k → +20, < $30k → +10
+ *   family_members: > 5 → +20, > 3 → +10
+ *   urgency       : Critical → +30, High → +20, Medium → +10, Low → +5
+ *   documents     : at least one document uploaded → +20
+ * Maximum possible score: 100
+ */
+function calculatePriorityScore({ income, family_members, urgency, hasDocuments }) {
+  let score = 0;
+
+  // Income factor (max 30)
+  const inc = parseFloat(income);
+  if (inc < 10000)      score += 30;
+  else if (inc < 20000) score += 20;
+  else if (inc < 30000) score += 10;
+
+  // Family factor (max 20)
+  const fam = parseInt(family_members);
+  if (fam > 5)      score += 20;
+  else if (fam > 3) score += 10;
+
+  // Urgency factor (max 30)
+  const urgencyMap = { Critical: 30, High: 20, Medium: 10, Low: 5 };
+  score += urgencyMap[urgency] || 0;
+
+  // Documents factor (max 20)
+  if (hasDocuments) score += 20;
+
+  return score;  // max 100
+}
+
+/**
+ * priorityLevel - derives a human-readable tier from the numeric score
+ */
+function priorityLevel(score) {
+  if (score >= 60) return 'High';
+  if (score >= 30) return 'Medium';
+  return 'Low';
+}
+
+/**
  * applyForFunds - submits a new assistance application
- * Body: { title, description, amount_requested, income_level, emergency_level, need_score }
- * Priority score formula: (10 - income_level) * 3 + emergency_level * 4 + need_score * 3
+ * Accepts multipart/form-data (for file uploads) or JSON.
+ * Body fields: phone, address, income, family_members, employment_status,
+ *              amount, category, reason, urgency
+ * Files (optional): income_proof, id_proof, supporting_docs
+ * Priority score is calculated entirely on the server side.
  */
 const applyForFunds = async (req, res) => {
   try {
-    const { title, description, amount_requested, income_level, emergency_level, need_score } = req.body;
+    const {
+      phone, address,
+      income, family_members, employment_status,
+      amount, category, reason, urgency
+    } = req.body;
 
-    // Validate all required fields are present
-    if (!title || !description || !amount_requested || !income_level || !emergency_level || !need_score) {
-      return res.status(400).json({ message: 'All fields are required' });
+    // Validate required fields
+    if (!income || !family_members || !employment_status ||
+        !amount || !category || !reason || !urgency) {
+      return res.status(400).json({ message: 'All required fields must be provided' });
     }
 
-    const inc = parseInt(income_level);
-    const emg = parseInt(emergency_level);
-    const nds = parseInt(need_score);
-
-    // Each level must be between 1 and 10
-    if ([inc, emg, nds].some(v => v < 1 || v > 10)) {
-      return res.status(400).json({ message: 'Levels must be between 1 and 10' });
+    const validCategories = ['Medical', 'Education', 'Emergency', 'Other'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ message: 'Invalid category' });
     }
 
-    if (parseFloat(amount_requested) <= 0) {
+    const validUrgency = ['Low', 'Medium', 'High', 'Critical'];
+    if (!validUrgency.includes(urgency)) {
+      return res.status(400).json({ message: 'Invalid urgency level' });
+    }
+
+    if (parseFloat(income) < 0) {
+      return res.status(400).json({ message: 'Income must be a non-negative number' });
+    }
+
+    if (parseInt(family_members) < 1) {
+      return res.status(400).json({ message: 'Family members must be at least 1' });
+    }
+
+    if (parseFloat(amount) <= 0) {
       return res.status(400).json({ message: 'Amount requested must be positive' });
     }
 
-    // Calculate priority score (higher = more urgent / more deserving), max 97
-    const priority_score = (10 - inc) * 3 + emg * 4 + nds * 3;
+    // Collect uploaded file paths (relative to uploads directory)
+    const uploadedFiles = [];
+    if (req.files) {
+      ['income_proof', 'id_proof', 'supporting_docs'].forEach(field => {
+        const files = req.files[field];
+        if (files && files.length > 0) {
+          files.forEach(f => uploadedFiles.push(`uploads/${f.filename}`));
+        }
+      });
+    }
+    const documents_path = uploadedFiles.length > 0
+      ? JSON.stringify(uploadedFiles)
+      : null;
+
+    // Server-side priority calculation – user has no control over this
+    const score = calculatePriorityScore({
+      income,
+      family_members,
+      urgency,
+      hasDocuments: uploadedFiles.length > 0
+    });
+    const level = priorityLevel(score);
 
     const [result] = await db.query(
       `INSERT INTO applications
-         (beneficiary_id, title, description, amount_requested, income_level, emergency_level, need_score, priority_score)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [req.user.id, title, description, parseFloat(amount_requested), inc, emg, nds, priority_score]
+         (beneficiary_id, phone, address, income, family_members, employment_status,
+          amount, category, reason, urgency, documents_path, priority_score, priority_level)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        req.user.id,
+        phone   || null,
+        address || null,
+        parseFloat(income),
+        parseInt(family_members),
+        employment_status,
+        parseFloat(amount),
+        category,
+        reason,
+        urgency,
+        documents_path,
+        score,
+        level
+      ]
     );
 
     res.status(201).json({
       message: 'Application submitted successfully',
       applicationId: result.insertId,
-      priority_score
+      priority_score: score,
+      priority_level: level
     });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

@@ -1,6 +1,6 @@
 /**
  * beneficiary.js – Beneficiary dashboard logic
- * Handles application submission, real-time priority score, application history
+ * Handles multi-step application form, application history, and status tracking
  */
 
 // ── Auth guard ─────────────────────────────────────────────────────────────
@@ -11,6 +11,10 @@ if (!token || !user || user.role !== 'beneficiary') {
   window.location.href = '/login.html';
 }
 
+// ── Multi-step form state ──────────────────────────────────────────────────
+let currentStep = 1;
+const TOTAL_STEPS = 5;
+
 // ── On page load ───────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   // Populate user identity
@@ -20,8 +24,23 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('headerAvatar').textContent  = initials;
   document.getElementById('welcomeName').textContent   = user.name.split(' ')[0];
 
-  // Initial priority score calculation
-  calcPriority();
+  // Auto-fill personal info from account
+  document.getElementById('appFullName').value = user.name || '';
+  document.getElementById('appEmail').value    = user.email || '';
+
+  // File input labels update on selection
+  ['incomeProof', 'idProof', 'supportingDocs'].forEach(id => {
+    const input = document.getElementById(id);
+    const nameEl = document.getElementById(id + 'Name');
+    if (input && nameEl) {
+      input.addEventListener('change', () => {
+        const files = Array.from(input.files);
+        nameEl.textContent = files.length > 0
+          ? files.map(f => f.name).join(', ')
+          : '';
+      });
+    }
+  });
 
   loadApplications();
 });
@@ -36,6 +55,11 @@ function showSection(name, linkEl) {
 
   const titles = { dashboard: 'Dashboard', apply: 'Apply for Aid', applications: 'My Applications' };
   document.getElementById('pageTitle').textContent = titles[name] || name;
+
+  // Reset multi-step form when navigating to apply section
+  if (name === 'apply') {
+    goToStep(1);
+  }
   return false;
 }
 
@@ -46,13 +70,14 @@ function toggleSidebar() {
 
 // ── API helper ─────────────────────────────────────────────────────────────
 async function apiFetch(url, options = {}) {
+  const headers = { 'Authorization': `Bearer ${token}` };
+  // Only add Content-Type for JSON bodies (not FormData)
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
   const res = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      ...(options.headers || {})
-    }
+    headers: { ...headers, ...(options.headers || {}) }
   });
   if (res.status === 401 || res.status === 403) {
     logout();
@@ -61,50 +86,97 @@ async function apiFetch(url, options = {}) {
   return res;
 }
 
-// ── Real-time priority score calculator ────────────────────────────────────
-function calcPriority() {
-  const income    = parseInt(document.getElementById('incomeLevel').value);
-  const emergency = parseInt(document.getElementById('emergencyLevel').value);
-  const need      = parseInt(document.getElementById('needScore').value);
+// ── Multi-step form navigation ──────────────────────────────────────────────
+function goToStep(step) {
+  // Hide all steps
+  document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+  // Show target step
+  const target = document.getElementById(`step-${step}`);
+  if (target) target.classList.add('active');
 
-  // Priority formula: (10 - income) * 3 + emergency * 4 + need * 3
-  const incomeFactor    = (10 - income) * 3;
-  const emergencyFactor = emergency * 4;
-  const needFactor      = need * 3;
-  const total           = incomeFactor + emergencyFactor + needFactor;
+  // Update stepper indicators
+  document.querySelectorAll('.step').forEach(el => {
+    const n = parseInt(el.dataset.step);
+    el.classList.remove('active', 'completed');
+    if (n === step) el.classList.add('active');
+    else if (n < step) el.classList.add('completed');
+  });
 
-  // Update breakdown display
-  document.getElementById('bkIncome').textContent    = incomeFactor;
-  document.getElementById('bkEmergency').textContent = emergencyFactor;
-  document.getElementById('bkNeed').textContent      = needFactor;
-  document.getElementById('bkTotal').textContent     = total;
-  document.getElementById('priorityScore').textContent = total;
-
-  // Determine priority tier
-  let tier, label;
-  if (total >= 60) {
-    tier  = 'high';
-    label = '🟢 High Priority';
-  } else if (total >= 35) {
-    tier  = 'medium';
-    label = '🟡 Medium Priority';
-  } else {
-    tier  = 'low';
-    label = '🔴 Low Priority';
-  }
-
-  // Update visual indicators
-  const circle = document.getElementById('priorityCircle');
-  circle.className = `priority-circle ${tier}`;
-
-  const labelEl = document.getElementById('priorityLabel');
-  labelEl.className = `priority-label ${tier}`;
-  labelEl.textContent = label;
+  currentStep = step;
 }
 
-// ── Slider display update ──────────────────────────────────────────────────
-function updateSlider(displayId, value) {
-  document.getElementById(displayId).textContent = value;
+function nextStep(step) {
+  if (!validateStep(step)) return;
+  if (step < TOTAL_STEPS) goToStep(step + 1);
+}
+
+function prevStep(step) {
+  if (step > 1) goToStep(step - 1);
+}
+
+// ── Step validation ─────────────────────────────────────────────────────────
+function validateStep(step) {
+  switch (step) {
+    case 1: {
+      const phone   = document.getElementById('appPhone').value.trim();
+      const address = document.getElementById('appAddress').value.trim();
+      if (!phone) {
+        showToast('Please enter your phone number', 'error');
+        return false;
+      }
+      if (!address) {
+        showToast('Please enter your address', 'error');
+        return false;
+      }
+      return true;
+    }
+    case 2: {
+      const income     = document.getElementById('appIncome').value;
+      const family     = document.getElementById('appFamily').value;
+      const employment = document.getElementById('appEmployment').value;
+      if (!income || parseFloat(income) < 0) {
+        showToast('Please enter a valid monthly income (0 or more)', 'error');
+        return false;
+      }
+      if (!family || parseInt(family) < 1) {
+        showToast('Please enter the number of family members (at least 1)', 'error');
+        return false;
+      }
+      if (!employment) {
+        showToast('Please select your employment status', 'error');
+        return false;
+      }
+      return true;
+    }
+    case 3: {
+      const amount   = document.getElementById('appAmount').value;
+      const category = document.getElementById('appCategory').value;
+      const reason   = document.getElementById('appReason').value.trim();
+      if (!amount || parseFloat(amount) <= 0) {
+        showToast('Please enter a valid amount greater than $0', 'error');
+        return false;
+      }
+      if (!category) {
+        showToast('Please select a category', 'error');
+        return false;
+      }
+      if (!reason) {
+        showToast('Please describe your reason for the request', 'error');
+        return false;
+      }
+      return true;
+    }
+    case 4: {
+      const urgency = document.getElementById('appUrgency').value;
+      if (!urgency) {
+        showToast('Please select an urgency level', 'error');
+        return false;
+      }
+      return true;
+    }
+    default:
+      return true;
+  }
 }
 
 // ── Load applications ──────────────────────────────────────────────────────
@@ -149,12 +221,11 @@ function renderApplicationsTable(container, apps) {
   const rows = apps.map(a => `
     <tr>
       <td>#${a.id}</td>
-      <td style="font-weight:600">${escHtml(a.title)}</td>
-      <td>${formatCurrency(a.amount_requested)}</td>
+      <td style="font-weight:600">${escHtml(a.category)}</td>
+      <td>${formatCurrency(a.amount)}</td>
       ${a.amount_allocated
         ? `<td style="color:#4fe995;font-weight:600">${formatCurrency(a.amount_allocated)}</td>`
         : `<td style="color:var(--text-muted)">—</td>`}
-      <td><span class="${getPriorityClass(a.priority_score)}">${a.priority_score}</span></td>
       <td>${getStatusBadge(a.status)}</td>
       <td>${formatDate(a.created_at)}</td>
     </tr>`).join('');
@@ -164,8 +235,8 @@ function renderApplicationsTable(container, apps) {
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>Title</th><th>Requested</th>
-            <th>Allocated</th><th>Priority</th><th>Status</th><th>Date</th>
+            <th>ID</th><th>Category</th><th>Requested</th>
+            <th>Allocated</th><th>Status</th><th>Date</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -177,37 +248,45 @@ function renderApplicationsTable(container, apps) {
 async function handleApply(e) {
   e.preventDefault();
 
-  const title         = document.getElementById('appTitle').value.trim();
-  const description   = document.getElementById('appDescription').value.trim();
-  const amount        = document.getElementById('appAmount').value;
-  const income_level  = parseInt(document.getElementById('incomeLevel').value);
-  const emergency_level = parseInt(document.getElementById('emergencyLevel').value);
-  const need_score    = parseInt(document.getElementById('needScore').value);
-  const btn           = document.getElementById('applyBtn');
+  // Validate step 5 (documents)
+  const incomeProof = document.getElementById('incomeProof').files[0];
+  const idProof     = document.getElementById('idProof').files[0];
 
-  if (!title || !description || !amount) {
-    showToast('Please fill in all required fields', 'error');
+  if (!incomeProof) {
+    showToast('Please upload your income proof document', 'error');
+    return;
+  }
+  if (!idProof) {
+    showToast('Please upload your ID proof document', 'error');
     return;
   }
 
-  if (parseFloat(amount) <= 0) {
-    showToast('Amount requested must be greater than $0', 'error');
-    return;
-  }
-
+  const btn = document.getElementById('applyBtn');
   setLoading(btn, true);
 
   try {
-    const res  = await apiFetch('/api/applications', {
+    // Use FormData for multipart upload (files + text fields)
+    const formData = new FormData();
+    formData.append('phone',             document.getElementById('appPhone').value.trim());
+    formData.append('address',           document.getElementById('appAddress').value.trim());
+    formData.append('income',            document.getElementById('appIncome').value);
+    formData.append('family_members',    document.getElementById('appFamily').value);
+    formData.append('employment_status', document.getElementById('appEmployment').value);
+    formData.append('amount',            document.getElementById('appAmount').value);
+    formData.append('category',          document.getElementById('appCategory').value);
+    formData.append('reason',            document.getElementById('appReason').value.trim());
+    formData.append('urgency',           document.getElementById('appUrgency').value);
+    formData.append('income_proof',  incomeProof);
+    formData.append('id_proof',      idProof);
+
+    const supportingDocs = document.getElementById('supportingDocs').files;
+    for (const f of supportingDocs) {
+      formData.append('supporting_docs', f);
+    }
+
+    const res = await apiFetch('/api/applications', {
       method: 'POST',
-      body: JSON.stringify({
-        title,
-        description,
-        amount_requested: parseFloat(amount),
-        income_level,
-        emergency_level,
-        need_score
-      })
+      body: formData
     });
     if (!res) return;
 
@@ -218,20 +297,19 @@ async function handleApply(e) {
       return;
     }
 
-    showToast(`🎉 Application submitted! Priority score: ${data.priority_score}`, 'success');
+    // Show success message
+    showToast('🎉 Application submitted successfully! Our team will review it shortly.', 'success');
 
-    // Reset form
+    // Reset form and go back to step 1
     document.getElementById('applyForm').reset();
-    // Reset sliders to default value 5
-    ['incomeLevel', 'emergencyLevel', 'needScore'].forEach(id => {
-      document.getElementById(id).value = 5;
+    // Clear file name labels
+    ['incomeProofName', 'idProofName', 'supportingDocsName'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
     });
-    ['incomeVal', 'emergencyVal', 'needVal'].forEach(id => {
-      document.getElementById(id).textContent = 5;
-    });
-    calcPriority();
+    goToStep(1);
 
-    // Reload applications and navigate to list
+    // Reload applications and navigate to the list
     loadApplications();
     showSection('applications', document.querySelector('[data-section=applications]'));
 
@@ -246,7 +324,7 @@ async function handleApply(e) {
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = '/login.html';
+  window.location.href = '/index.html';
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -257,12 +335,6 @@ function formatCurrency(amount) {
 function formatDate(str) {
   if (!str) return '—';
   return new Date(str).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function getPriorityClass(score) {
-  if (score >= 60) return 'priority-high';
-  if (score >= 35) return 'priority-medium';
-  return 'priority-low';
 }
 
 function getStatusBadge(status) {
@@ -299,5 +371,5 @@ function showToast(message, type = 'info') {
   const toast = document.getElementById('toast');
   toast.textContent = message;
   toast.className   = `toast ${type} show`;
-  setTimeout(() => toast.classList.remove('show'), 3500);
+  setTimeout(() => toast.classList.remove('show'), 4000);
 }

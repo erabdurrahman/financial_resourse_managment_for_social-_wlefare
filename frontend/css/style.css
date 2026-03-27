@@ -928,3 +928,207 @@ input[type="range"]::-moz-range-thumb {
   .table-wrap { font-size: 0.8rem; }
   th, td { padding: 0.6rem 0.75rem; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MULTI-STEP APPLICATION FORM
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Stepper ────────────────────────────────────────────────────────────── */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.step-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.step.active .step-circle {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(102,126,234,0.5);
+}
+
+.step.completed .step-circle {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.step.completed .step-circle::after {
+  content: '✓';
+  position: absolute;
+}
+
+.step-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.step.active .step-label { color: var(--primary); font-weight: 600; }
+.step.completed .step-label { color: var(--success); }
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  min-width: 24px;
+  max-width: 60px;
+  background: rgba(255,255,255,0.15);
+  margin-bottom: 1.2rem;
+  transition: background 0.3s;
+}
+
+/* ── Form steps ─────────────────────────────────────────────────────────── */
+.form-step { display: none; animation: fadeIn 0.35s ease; }
+.form-step.active { display: block; }
+
+.step-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.step-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* ── Step navigation buttons ────────────────────────────────────────────── */
+.step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+/* ── File upload ────────────────────────────────────────────────────────── */
+.file-upload-wrap {
+  position: relative;
+}
+
+.file-upload-wrap input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1.25rem;
+  background: rgba(255,255,255,0.05);
+  border: 2px dashed rgba(255,255,255,0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+  text-align: center;
+}
+
+.file-upload-wrap:hover .file-upload-label,
+.file-upload-wrap input[type="file"]:focus + .file-upload-label {
+  border-color: var(--primary);
+  background: rgba(102,126,234,0.08);
+}
+
+.file-icon { font-size: 1.8rem; }
+
+.file-text {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.file-hint {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.file-name {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--success);
+  word-break: break-all;
+}
+
+/* ── Urgency info box ───────────────────────────────────────────────────── */
+.urgency-info { margin: 1rem 0; }
+
+.info-box {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(102,126,234,0.1);
+  border: 1px solid rgba(102,126,234,0.25);
+  border-radius: 10px;
+}
+
+.info-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+.info-box p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Score breakdown in admin table ─────────────────────────────────────── */
+.score-breakdown-mini {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+}
+
+.score-breakdown-mini span {
+  font-size: 0.68rem;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* ── Form helpers ───────────────────────────────────────────────────────── */
+.required { color: #ff6b8a; }
+.optional  { color: var(--text-muted); font-size: 0.78rem; font-weight: 400; }
+.hint      { color: var(--text-muted); font-size: 0.78rem; margin-top: 0.3rem; display: block; }

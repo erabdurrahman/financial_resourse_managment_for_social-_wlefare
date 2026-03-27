@@ -99,101 +99,210 @@
     <section class="content-section" id="section-apply">
       <div class="section-header">
         <h2>Apply for Financial Assistance</h2>
-        <p>Complete the form below. Your priority score is calculated automatically based on your situation.</p>
+        <p>Complete the form below. Our system will assess your application fairly and impartially.</p>
       </div>
 
-      <div class="apply-grid">
-        <!-- Application form -->
-        <div class="form-card">
-          <form id="applyForm" onsubmit="handleApply(event)">
+      <!-- Step indicator -->
+      <div class="stepper" id="stepper">
+        <div class="step active" data-step="1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Personal</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" data-step="2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Financial</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" data-step="3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Aid Request</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" data-step="4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Urgency</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" data-step="5">
+          <div class="step-circle">5</div>
+          <div class="step-label">Documents</div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <form id="applyForm" onsubmit="handleApply(event)" enctype="multipart/form-data" novalidate>
+
+          <!-- Step 1: Personal Info -->
+          <div class="form-step active" id="step-1">
+            <h3 class="step-title">👤 Personal Information</h3>
             <div class="form-group">
-              <label>Application Title</label>
-              <input type="text" id="appTitle" placeholder="e.g., Medical Emergency Assistance" required />
+              <label>Full Name</label>
+              <input type="text" id="appFullName" readonly />
+              <small class="hint">Auto-filled from your account</small>
             </div>
             <div class="form-group">
-              <label>Description of Need</label>
-              <textarea id="appDescription" rows="4" placeholder="Describe your situation and why you need financial assistance…" required></textarea>
+              <label>Email Address</label>
+              <input type="email" id="appEmail" readonly />
+              <small class="hint">Auto-filled from your account</small>
             </div>
             <div class="form-group">
-              <label>Amount Requested (USD)</label>
+              <label>Phone Number <span class="required">*</span></label>
+              <input type="tel" id="appPhone" placeholder="e.g. +1 555-1234" />
+            </div>
+            <div class="form-group">
+              <label>Address <span class="required">*</span></label>
+              <textarea id="appAddress" rows="2" placeholder="Street, City, State / Province"></textarea>
+            </div>
+            <div class="step-nav">
+              <span></span>
+              <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next →</button>
+            </div>
+          </div>
+
+          <!-- Step 2: Financial Details -->
+          <div class="form-step" id="step-2">
+            <h3 class="step-title">💵 Financial Details</h3>
+            <div class="form-group">
+              <label>Monthly Income (USD) <span class="required">*</span></label>
               <div class="amount-input-wrap">
                 <span class="currency-prefix">$</span>
-                <input type="number" id="appAmount" placeholder="0.00" min="1" step="0.01" required />
+                <input type="number" id="appIncome" placeholder="0.00" min="0" step="0.01" />
               </div>
             </div>
-
-            <!-- Sliders -->
-            <div class="slider-section">
-              <div class="slider-group">
-                <div class="slider-header">
-                  <label>Income Level</label>
-                  <span class="slider-value" id="incomeVal">5</span>
-                </div>
-                <input type="range" id="incomeLevel" min="1" max="10" value="5"
-                       oninput="updateSlider('incomeVal', this.value); calcPriority()" />
-                <div class="slider-hints"><span>Very Low (1)</span><span>Very High (10)</span></div>
-              </div>
-
-              <div class="slider-group">
-                <div class="slider-header">
-                  <label>Emergency Level</label>
-                  <span class="slider-value" id="emergencyVal">5</span>
-                </div>
-                <input type="range" id="emergencyLevel" min="1" max="10" value="5"
-                       oninput="updateSlider('emergencyVal', this.value); calcPriority()" />
-                <div class="slider-hints"><span>Low Urgency (1)</span><span>Life Threatening (10)</span></div>
-              </div>
-
-              <div class="slider-group">
-                <div class="slider-header">
-                  <label>Need Score</label>
-                  <span class="slider-value" id="needVal">5</span>
-                </div>
-                <input type="range" id="needScore" min="1" max="10" value="5"
-                       oninput="updateSlider('needVal', this.value); calcPriority()" />
-                <div class="slider-hints"><span>Minimal Need (1)</span><span>Critical Need (10)</span></div>
-              </div>
+            <div class="form-group">
+              <label>Number of Family Members <span class="required">*</span></label>
+              <input type="number" id="appFamily" placeholder="e.g. 4" min="1" step="1" />
             </div>
-
-            <button type="submit" class="btn btn-primary btn-block" id="applyBtn">
-              <span class="btn-text">📝 Submit Application</span>
-              <span class="spinner-sm"></span>
-            </button>
-          </form>
-        </div>
-
-        <!-- Priority score display -->
-        <div class="priority-panel">
-          <h3>Priority Score Calculator</h3>
-          <div class="priority-circle" id="priorityCircle">
-            <div class="priority-number" id="priorityScore">50</div>
-            <div class="priority-max">/ 97</div>
-          </div>
-          <div class="priority-label" id="priorityLabel">Medium Priority</div>
-          <div class="priority-breakdown">
-            <h4>Score Breakdown</h4>
-            <div class="breakdown-row">
-              <span>Income Factor</span>
-              <span id="bkIncome" class="breakdown-val">15</span>
+            <div class="form-group">
+              <label>Employment Status <span class="required">*</span></label>
+              <select id="appEmployment">
+                <option value="" disabled selected>Select status…</option>
+                <option value="Employed">Employed (Full-time)</option>
+                <option value="Part-time">Employed (Part-time)</option>
+                <option value="Self-employed">Self-employed</option>
+                <option value="Unemployed">Unemployed</option>
+                <option value="Retired">Retired</option>
+                <option value="Student">Student</option>
+                <option value="Disabled">Unable to Work (Disability)</option>
+              </select>
             </div>
-            <div class="breakdown-row">
-              <span>Emergency Factor</span>
-              <span id="bkEmergency" class="breakdown-val">20</span>
-            </div>
-            <div class="breakdown-row">
-              <span>Need Factor</span>
-              <span id="bkNeed" class="breakdown-val">15</span>
-            </div>
-            <div class="breakdown-row breakdown-total">
-              <span>Total Priority</span>
-              <span id="bkTotal" class="breakdown-val">50</span>
+            <div class="step-nav">
+              <button type="button" class="btn btn-outline" onclick="prevStep(2)">← Back</button>
+              <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next →</button>
             </div>
           </div>
-          <p class="priority-formula">
-            <strong>Formula:</strong><br />
-            (10 − Income) × 3 + Emergency × 4 + Need × 3
-          </p>
-        </div>
+
+          <!-- Step 3: Aid Request -->
+          <div class="form-step" id="step-3">
+            <h3 class="step-title">🎯 Aid Request Details</h3>
+            <div class="form-group">
+              <label>Amount Requested (USD) <span class="required">*</span></label>
+              <div class="amount-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input type="number" id="appAmount" placeholder="0.00" min="1" step="0.01" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Category <span class="required">*</span></label>
+              <select id="appCategory">
+                <option value="" disabled selected>Select category…</option>
+                <option value="Medical">🏥 Medical</option>
+                <option value="Education">📚 Education</option>
+                <option value="Emergency">🚨 Emergency</option>
+                <option value="Other">📦 Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Reason for Request <span class="required">*</span></label>
+              <textarea id="appReason" rows="4" placeholder="Describe your situation and why you need financial assistance…"></textarea>
+            </div>
+            <div class="step-nav">
+              <button type="button" class="btn btn-outline" onclick="prevStep(3)">← Back</button>
+              <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next →</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Urgency -->
+          <div class="form-step" id="step-4">
+            <h3 class="step-title">⚡ Urgency Level</h3>
+            <p class="step-desc">Select how urgent your situation is. Be honest — this helps us prioritise those most in need.</p>
+            <div class="form-group">
+              <label>Urgency Level <span class="required">*</span></label>
+              <select id="appUrgency">
+                <option value="" disabled selected>Select urgency…</option>
+                <option value="Low">🟢 Low — Can wait a few months</option>
+                <option value="Medium">🟡 Medium — Needed within a month</option>
+                <option value="High">🟠 High — Needed within a week</option>
+                <option value="Critical">🔴 Critical — Immediate danger or medical emergency</option>
+              </select>
+            </div>
+            <div class="urgency-info">
+              <div class="info-box">
+                <span class="info-icon">ℹ️</span>
+                <p>Your application priority is assessed fairly by our system based on income, family size, urgency, and supporting documents. You will not see a score — our team reviews all applications carefully.</p>
+              </div>
+            </div>
+            <div class="step-nav">
+              <button type="button" class="btn btn-outline" onclick="prevStep(4)">← Back</button>
+              <button type="button" class="btn btn-primary" onclick="nextStep(4)">Next →</button>
+            </div>
+          </div>
+
+          <!-- Step 5: Documents -->
+          <div class="form-step" id="step-5">
+            <h3 class="step-title">📎 Supporting Documents</h3>
+            <p class="step-desc">Upload documents to support your application. Accepted formats: PDF, JPG, PNG (max 5 MB each).</p>
+
+            <div class="form-group">
+              <label>Income Proof <span class="required">*</span></label>
+              <div class="file-upload-wrap">
+                <input type="file" id="incomeProof" name="income_proof" accept=".pdf,.jpg,.jpeg,.png" />
+                <label for="incomeProof" class="file-upload-label">
+                  <span class="file-icon">📄</span>
+                  <span class="file-text">Click to upload income proof</span>
+                  <span class="file-hint">Pay slip, bank statement, tax return…</span>
+                </label>
+                <span class="file-name" id="incomeProofName"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>ID Proof <span class="required">*</span></label>
+              <div class="file-upload-wrap">
+                <input type="file" id="idProof" name="id_proof" accept=".pdf,.jpg,.jpeg,.png" />
+                <label for="idProof" class="file-upload-label">
+                  <span class="file-icon">🪪</span>
+                  <span class="file-text">Click to upload ID proof</span>
+                  <span class="file-hint">Passport, driver's licence, national ID…</span>
+                </label>
+                <span class="file-name" id="idProofName"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Supporting Documents <span class="optional">(Optional)</span></label>
+              <div class="file-upload-wrap">
+                <input type="file" id="supportingDocs" name="supporting_docs" accept=".pdf,.jpg,.jpeg,.png" multiple />
+                <label for="supportingDocs" class="file-upload-label">
+                  <span class="file-icon">📁</span>
+                  <span class="file-text">Click to upload additional documents</span>
+                  <span class="file-hint">Medical reports, utility bills, eviction notice…</span>
+                </label>
+                <span class="file-name" id="supportingDocsName"></span>
+              </div>
+            </div>
+
+            <div class="step-nav">
+              <button type="button" class="btn btn-outline" onclick="prevStep(5)">← Back</button>
+              <button type="submit" class="btn btn-primary btn-block" id="applyBtn">
+                <span class="btn-text">📝 Submit Application</span>
+                <span class="spinner-sm"></span>
+              </button>
+            </div>
+          </div>
+
+        </form>
       </div>
     </section>
 

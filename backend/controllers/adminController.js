@@ -2,8 +2,32 @@
 const db = require('../config/db');
 
 /**
+ * scoreBreakdown - reconstruct the individual factor scores for display purposes
+ * Mirrors the logic in applicationController.calculatePriorityScore
+ */
+function scoreBreakdown(app) {
+  let incomeFactor = 0;
+  const inc = parseFloat(app.income || 0);
+  if (inc < 10000)      incomeFactor = 30;
+  else if (inc < 20000) incomeFactor = 20;
+  else if (inc < 30000) incomeFactor = 10;
+
+  let familyFactor = 0;
+  const fam = parseInt(app.family_members || 0);
+  if (fam > 5)      familyFactor = 20;
+  else if (fam > 3) familyFactor = 10;
+
+  const urgencyMap = { Critical: 30, High: 20, Medium: 10, Low: 5 };
+  const urgencyFactor = urgencyMap[app.urgency] || 0;
+
+  const documentFactor = app.documents_path ? 20 : 0;
+
+  return { incomeFactor, familyFactor, urgencyFactor, documentFactor };
+}
+
+/**
  * getAllApplications - returns all applications sorted by priority (highest first)
- * Includes beneficiary and reviewer details via JOIN
+ * Includes beneficiary and reviewer details via JOIN, plus score breakdown
  */
 const getAllApplications = async (req, res) => {
   try {
@@ -17,7 +41,12 @@ const getAllApplications = async (req, res) => {
        LEFT JOIN users r ON a.reviewed_by = r.id
        ORDER BY a.priority_score DESC, a.created_at ASC`
     );
-    res.json(applications);
+    // Attach score breakdown to each application
+    const enriched = applications.map(a => ({
+      ...a,
+      score_breakdown: scoreBreakdown(a)
+    }));
+    res.json(enriched);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -59,10 +88,10 @@ const approveApplication = async (req, res) => {
 
     const available = parseFloat(total_donated) - parseFloat(total_allocated);
 
-    if (parseFloat(app.amount_requested) > available) {
+    if (parseFloat(app.amount) > available) {
       await connection.rollback();
       return res.status(400).json({
-        message: `Insufficient funds. Available: $${available.toFixed(2)}, Requested: $${parseFloat(app.amount_requested).toFixed(2)}`
+        message: `Insufficient funds. Available: $${available.toFixed(2)}, Requested: $${parseFloat(app.amount).toFixed(2)}`
       });
     }
 
@@ -71,20 +100,20 @@ const approveApplication = async (req, res) => {
       `UPDATE applications
        SET status = 'approved', amount_allocated = ?, reviewed_by = ?, reviewed_at = NOW()
        WHERE id = ?`,
-      [app.amount_requested, req.user.id, app.id]
+      [app.amount, req.user.id, app.id]
     );
 
     // Insert allocation transaction record
     await connection.query(
       `INSERT INTO transactions (application_id, beneficiary_id, amount, type)
        VALUES (?, ?, ?, 'allocation')`,
-      [app.id, app.beneficiary_id, app.amount_requested]
+      [app.id, app.beneficiary_id, app.amount]
     );
 
     await connection.commit();
     res.json({
       message: 'Application approved successfully',
-      amount_allocated: parseFloat(app.amount_requested)
+      amount_allocated: parseFloat(app.amount)
     });
   } catch (err) {
     await connection.rollback();
