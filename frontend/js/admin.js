@@ -140,16 +140,27 @@ function renderApplicationsTable(containerId, apps, showActions) {
     return;
   }
 
-  const rows = apps.map(a => `
+  const rows = apps.map(a => {
+    const bd = a.score_breakdown || {};
+    const breakdownTip = `Income: +${bd.incomeFactor || 0} | Family: +${bd.familyFactor || 0} | Urgency: +${bd.urgencyFactor || 0} | Docs: +${bd.documentFactor || 0}`;
+    return `
     <tr>
       <td>#${a.id}</td>
       <td>
         <div style="font-weight:600">${escHtml(a.beneficiary_name)}</div>
         <div style="font-size:0.75rem;color:var(--text-muted)">${escHtml(a.beneficiary_email)}</div>
       </td>
-      <td>${escHtml(a.title)}</td>
-      <td>${formatCurrency(a.amount_requested)}</td>
-      <td><span class="${getPriorityClass(a.priority_score)}">${a.priority_score}</span></td>
+      <td>${escHtml(a.category)}</td>
+      <td>${formatCurrency(a.amount)}</td>
+      <td>
+        <span class="${getPriorityClass(a.priority_score)}" title="${escHtml(breakdownTip)}">${a.priority_score}</span>
+        <div class="score-breakdown-mini">
+          <span title="Income factor">💵 +${bd.incomeFactor || 0}</span>
+          <span title="Family factor">👨‍👩‍👧 +${bd.familyFactor || 0}</span>
+          <span title="Urgency factor">⚡ +${bd.urgencyFactor || 0}</span>
+          <span title="Documents factor">📄 +${bd.documentFactor || 0}</span>
+        </div>
+      </td>
       <td>${getStatusBadge(a.status)}</td>
       <td>${formatDate(a.created_at)}</td>
       ${showActions ? `<td>
@@ -158,16 +169,16 @@ function renderApplicationsTable(containerId, apps, showActions) {
           <button class="action-btn action-reject"  onclick="confirmAction('reject',  ${a.id})">❌ Reject</button>
         ` : '–'}
       </td>` : ''}
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 
   container.innerHTML = `
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>Beneficiary</th><th>Title</th>
-            <th>Amount</th><th>Priority</th><th>Status</th><th>Date</th>
+            <th>ID</th><th>Beneficiary</th><th>Category</th>
+            <th>Amount</th><th>Priority / Breakdown</th><th>Status</th><th>Date</th>
             ${showActions ? '<th>Actions</th>' : ''}
           </tr>
         </thead>
@@ -293,7 +304,7 @@ async function modalConfirm() {
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = '/login.html';
+  window.location.href = '/index.html';
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────

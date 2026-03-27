@@ -43,3 +43,6 @@ Thumbs.db
 # Misc
 .cache/
 .tmp/
+
+# User uploaded files
+uploads/

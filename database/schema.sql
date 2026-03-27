@@ -26,17 +26,26 @@ CREATE TABLE donations (
 );
 
 -- Applications table: beneficiaries apply for financial assistance
--- priority_score = (10 - income_level) * 3 + emergency_level * 4 + need_score * 3 (max 97)
+-- priority_score is calculated server-side (max 100):
+--   income < 10000 -> +30, < 20000 -> +20, < 30000 -> +10
+--   family_members > 5 -> +20, > 3 -> +10
+--   urgency: critical -> +30, high -> +20, medium -> +10, low -> +5
+--   documents present -> +20
 CREATE TABLE applications (
   id INT AUTO_INCREMENT PRIMARY KEY,
   beneficiary_id INT NOT NULL,
-  title VARCHAR(200) NOT NULL,
-  description TEXT NOT NULL,
-  amount_requested DECIMAL(10, 2) NOT NULL,
-  income_level INT NOT NULL COMMENT '1-10 scale, 1=lowest income',
-  emergency_level INT NOT NULL COMMENT '1-10 scale, 10=most urgent',
-  need_score INT NOT NULL COMMENT '1-10 scale, 10=highest need',
-  priority_score INT NOT NULL COMMENT 'Calculated: (10-income)*3 + emergency*4 + need*3, max 97',
+  phone VARCHAR(30),
+  address TEXT,
+  income DECIMAL(12, 2) NOT NULL COMMENT 'Monthly income in USD',
+  family_members INT NOT NULL COMMENT 'Number of family members',
+  employment_status VARCHAR(50) NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL COMMENT 'Amount requested',
+  category ENUM('Medical', 'Education', 'Emergency', 'Other') NOT NULL,
+  reason TEXT NOT NULL,
+  urgency ENUM('Low', 'Medium', 'High', 'Critical') NOT NULL,
+  documents_path TEXT DEFAULT NULL COMMENT 'JSON array of uploaded file paths',
+  priority_score INT NOT NULL DEFAULT 0,
+  priority_level ENUM('Low', 'Medium', 'High') NOT NULL DEFAULT 'Low',
   status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
   amount_allocated DECIMAL(10, 2) DEFAULT NULL,
   reviewed_by INT DEFAULT NULL,
@@ -80,30 +89,27 @@ INSERT INTO donations (donor_id, amount, message) VALUES
   (3, 3000.00, 'Small contribution, hope it helps someone today.'),
   (2, 2000.00, 'Monthly recurring donation for the welfare fund.');
 
--- Sample applications with varying levels
--- Application 1: Maria - High priority (income=2, emergency=9, need=8)
---   priority = (10-2)*3 + 9*4 + 8*3 = 24 + 36 + 24 = 84 -> capped display, stored as 84? No, max is 70 if levels are 1-10
---   Actually max: income=1 -> (10-1)*3=27, emergency=10 -> 40, need=10 -> 30 => 97. Let's just store computed values.
---   priority = (10-2)*3 + 9*4 + 8*3 = 24+36+24 = 84
-INSERT INTO applications (beneficiary_id, title, description, amount_requested, income_level, emergency_level, need_score, priority_score, status) VALUES
-  (4, 'Medical Emergency Assistance',
-   'Urgent medical bills for heart surgery. Family of 4 with very low income. Cannot afford treatment without assistance.',
-   1500.00, 2, 9, 8, 84, 'pending'),
+-- Sample applications using new schema
+-- Application 1: Maria - Critical urgency, low income, large family -> score 30+20+30+20=100 -> High
+INSERT INTO applications
+  (beneficiary_id, phone, address, income, family_members, employment_status,
+   amount, category, reason, urgency, documents_path, priority_score, priority_level, status)
+VALUES
+  (4, '555-1001', '12 Oak Street, Springfield', 8000.00, 6, 'Unemployed',
+   1500.00, 'Medical', 'Urgent medical bills for heart surgery. Family of 6 with very low income. Cannot afford treatment without assistance.',
+   'Critical', '["uploads/sample_income_proof.pdf","uploads/sample_id_proof.pdf"]', 100, 'High', 'pending'),
 
--- Application 2: Carlos - Medium-high priority (income=4, emergency=7, need=6)
---   priority = (10-4)*3 + 7*4 + 6*3 = 18+28+18 = 64
-  (5, 'Housing Rent Assistance',
-   'At risk of eviction after job loss. Single parent with two children. Need 3 months rent support to stabilize.',
-   900.00, 4, 7, 6, 64, 'pending'),
+-- Application 2: Carlos - High urgency, medium-low income, family of 3 -> score 20+10+20+20=70 -> High
+  (5, '555-2002', '45 Maple Ave, Riverside', 15000.00, 3, 'Part-time',
+   900.00, 'Emergency', 'At risk of eviction after job loss. Single parent with two children. Need 3 months rent support to stabilize.',
+   'High', '["uploads/sample_income_proof.pdf"]', 70, 'High', 'pending'),
 
--- Application 3: Maria - Medium priority (income=5, emergency=5, need=5)
---   priority = (10-5)*3 + 5*4 + 5*3 = 15+20+15 = 50
-  (4, 'Education Support for Children',
-   'Need school supplies and uniforms for 3 children. Cannot afford basic education materials this semester.',
-   400.00, 5, 5, 5, 50, 'pending'),
+-- Application 3: Maria - Medium urgency, medium income, family of 2 -> score 10+0+10+0=20 -> Low
+  (4, '555-1001', '12 Oak Street, Springfield', 25000.00, 2, 'Part-time',
+   400.00, 'Education', 'Need school supplies and uniforms for 2 children. Cannot afford basic education materials this semester.',
+   'Medium', NULL, 20, 'Low', 'pending'),
 
--- Application 4: Carlos - Lower priority (income=6, emergency=3, need=4)
---   priority = (10-6)*3 + 3*4 + 4*3 = 12+12+12 = 36
-  (5, 'Vocational Training Program',
-   'Want to enroll in a 6-month coding bootcamp to improve employment prospects and become self-sufficient.',
-   600.00, 6, 3, 4, 36, 'pending');
+-- Application 4: Carlos - Low urgency, higher income, small family -> score 0+0+5+0=5 -> Low
+  (5, '555-2002', '45 Maple Ave, Riverside', 35000.00, 2, 'Employed',
+   600.00, 'Education', 'Want to enroll in a 6-month coding bootcamp to improve employment prospects and become self-sufficient.',
+   'Low', NULL, 5, 'Low', 'pending');
