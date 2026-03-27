@@ -7,6 +7,16 @@ require('dotenv').config();
 
 const app = express();
 
+// ─── Environment Variable Checks ─────────────────────────────────────────────
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ FATAL: JWT_SECRET environment variable is not set. Refusing to start in production.');
+    process.exit(1);
+  } else {
+    console.warn('⚠️  WARNING: JWT_SECRET is not set. Using an insecure default for development. Set JWT_SECRET in your .env file before deploying.');
+  }
+}
+
 // ─── Rate Limiters ────────────────────────────────────────────────────────────
 // Strict limit for auth endpoints (login/register) to prevent brute-force attacks
 const authLimiter = rateLimit({
