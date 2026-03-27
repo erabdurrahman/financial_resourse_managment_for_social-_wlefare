@@ -3,163 +3,502 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinWelfare – Financial Resource Management for Social Welfare</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <meta name="description" content="FinWelfare – Transparent financial resource management for social welfare. Empowering donors, beneficiaries, and administrators with real-time tracking and secure fund allocation." />
+  <title>FinWelfare – Empowering Transparent Social Welfare Funding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    body.home-page {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-    .particles-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      animation: floatUp linear infinite;
-      opacity: 0.15;
-    }
-    @keyframes floatUp {
-      0%   { transform: translateY(110vh) scale(1);   opacity: 0.15; }
-      100% { transform: translateY(-10vh) scale(1.3); opacity: 0; }
-    }
-    .home-wrapper {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 800px;
-      margin: 2rem 1rem;
-      text-align: center;
-    }
-    .home-logo .logo-icon {
-      width: 80px;
-      height: 80px;
-      background: var(--glass-bg);
-      border: 2px solid var(--glass-border);
-      border-radius: 24px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      backdrop-filter: blur(10px);
-    }
-    .home-logo h1 {
-      font-size: 2.4rem;
-      font-weight: 700;
-      color: #fff;
-      margin: 0 0 0.5rem;
-    }
-    .home-logo p {
-      color: var(--text-muted);
-      font-size: 1rem;
-      margin-bottom: 2.5rem;
-    }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2.5rem;
-    }
-    .feature-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--card-radius);
-      padding: 1.5rem 1rem;
-      backdrop-filter: blur(12px);
-    }
-    .feature-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
-    .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.35rem; }
-    .feature-card p  { color: var(--text-muted); font-size: 0.83rem; line-height: 1.5; }
-    .cta-btn {
-      display: inline-block;
-      padding: 0.9rem 2.5rem;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      border-radius: 14px;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(102,126,234,0.4);
-    }
-    .cta-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(102,126,234,0.55);
-    }
-    .footer-note {
-      margin-top: 2rem;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-    }
-  </style>
+  <link rel="stylesheet" href="css/landing.css" />
 </head>
-<body class="home-page">
+<body class="landing-page">
 
-  <!-- Animated particle background -->
-  <div class="particles-bg" id="particles"></div>
+  <!-- ══════════════════════════════════════════════════════ NAVBAR ═══ -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">💰</div>
+      FinWelfare
+    </a>
 
-  <div class="home-wrapper">
-    <!-- Branding -->
-    <div class="home-logo">
-      <div class="logo-icon">💰</div>
-      <h1>FinWelfare</h1>
-      <p>Financial Resource Management for Social Welfare</p>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#testimonials">Testimonials</a></li>
+    </ul>
+
+    <div class="nav-cta" id="navCta">
+      <a href="login.html" class="btn-nav-login">Login</a>
+      <a href="login.html" class="btn-nav-start">Get Started</a>
     </div>
 
-    <!-- Feature highlights -->
-    <div class="features">
-      <div class="feature-card">
-        <div class="icon">🤝</div>
-        <h3>Beneficiaries</h3>
-        <p>Apply for financial aid and track the status of your applications in real time.</p>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════════ HERO ═══ -->
+  <section class="hero" id="home">
+    <div class="hero-bg">
+      <div class="hero-blob hero-blob-1"></div>
+      <div class="hero-blob hero-blob-2"></div>
+      <div class="hero-blob hero-blob-3"></div>
+      <div class="particles-bg" id="particles"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Now live – transparent welfare funding platform
       </div>
-      <div class="feature-card">
-        <div class="icon">💸</div>
-        <h3>Donors</h3>
-        <p>Contribute funds and view your complete donation history at a glance.</p>
+
+      <h1 class="hero-title">
+        Empowering <span class="gradient-text">Transparent</span><br />
+        Social Welfare Funding
+      </h1>
+
+      <p class="hero-sub">
+        A unified platform connecting donors, beneficiaries, and administrators —
+        with real-time tracking, fair fund allocation, and end-to-end transparency.
+      </p>
+
+      <div class="hero-cta">
+        <a href="login.html" class="btn-primary">
+          🚀 Get Started — It's Free
+        </a>
+        <a href="#how-it-works" class="btn-secondary">
+          ▶ See How It Works
+        </a>
       </div>
-      <div class="feature-card">
-        <div class="icon">🛡️</div>
-        <h3>Administrators</h3>
-        <p>Review applications, allocate resources, and oversee all platform activity.</p>
+
+      <div class="hero-trust">
+        <div class="trust-item"><span class="ti-icon">🔒</span> Bank-level security</div>
+        <div class="trust-item"><span class="ti-icon">⚡</span> Real-time updates</div>
+        <div class="trust-item"><span class="ti-icon">🌍</span> Open &amp; transparent</div>
+        <div class="trust-item"><span class="ti-icon">✅</span> Role-based access</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ FEATURES ═══ -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-tag">Core Features</div>
+      <h2 class="section-title">Everything you need for<br /><span>responsible fund management</span></h2>
+      <p class="section-sub">
+        Built for transparency and fairness — every feature is designed to ensure funds
+        reach those who need them most.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feat-icon-wrap purple">🔍</div>
+          <h3>Transparent Fund Allocation</h3>
+          <p>Every rupee is tracked. Donors can see exactly where their contributions go, with a complete audit trail available at all times.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon-wrap blue">📊</div>
+          <h3>Real-time Tracking</h3>
+          <p>Live dashboards show donation inflows, application statuses, and fund disbursements — updated instantly for all stakeholders.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon-wrap pink">🔐</div>
+          <h3>Secure Donations</h3>
+          <p>Encrypted transactions and verified donor accounts ensure that every contribution is safe, authentic, and immutable.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon-wrap green">👥</div>
+          <h3>Role-based Access</h3>
+          <p>Separate dashboards for Admins, Donors, and Beneficiaries — each user sees only what they need, keeping data private and organised.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ HOW IT WORKS ═══ -->
+  <section class="how-section" id="how-it-works">
+    <div class="container">
+      <div class="section-tag">Process</div>
+      <h2 class="section-title">How <span>It Works</span></h2>
+      <p class="section-sub">
+        A simple four-step journey from donation to impact — fully transparent and auditable.
+      </p>
+
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <div class="step-number">1</div>
+          <div class="step-icon">💸</div>
+          <h3>Donor Contributes</h3>
+          <p>Registered donors securely contribute funds through the platform. Every donation is recorded with a receipt.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">2</div>
+          <div class="step-icon">📝</div>
+          <h3>Beneficiary Applies</h3>
+          <p>Verified beneficiaries submit aid applications with supporting documentation directly through the portal.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">3</div>
+          <div class="step-icon">🛡️</div>
+          <h3>Admin Reviews</h3>
+          <p>Administrators audit each application, verify eligibility, and approve or reject with full justification logged.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">4</div>
+          <div class="step-icon">🎯</div>
+          <h3>Funds Allocated</h3>
+          <p>Approved funds are disbursed based on priority scoring — the most critical needs are served first, every time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════ STATS ═══ -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card reveal">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value" data-target="1250000" data-format="rupee">₹0</div>
+          <div class="stat-label">Total Donations Raised</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-icon">🤝</div>
+          <div class="stat-value" data-target="3400">0</div>
+          <div class="stat-label">Beneficiaries Helped</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-icon">💳</div>
+          <div class="stat-value" data-target="820">0</div>
+          <div class="stat-label">Active Donors</div>
+        </div>
+        <div class="stat-card reveal">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" data-target="98" data-format="percent">0</div>
+          <div class="stat-label">% Fund Utilisation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ ABOUT ═══ -->
+  <section class="about-section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <div class="section-tag">About the Project</div>
+          <h2 class="section-title">Solving the <span>trust gap</span> in social welfare</h2>
+          <p class="section-sub">
+            Traditional welfare systems are plagued by opacity — donors don't know where
+            their money goes, and deserving beneficiaries are often overlooked due to
+            manual, biased processes.
+          </p>
+          <ul class="about-points">
+            <li>
+              <span class="check">✓</span>
+              <span><strong>Full auditability</strong> — every transaction, application, and decision is logged and verifiable by all parties.</span>
+            </li>
+            <li>
+              <span class="check">✓</span>
+              <span><strong>Algorithmic fairness</strong> — a priority-based system removes human bias from fund allocation decisions.</span>
+            </li>
+            <li>
+              <span class="check">✓</span>
+              <span><strong>Community-driven</strong> — donors engage with real impact data, building sustained long-term giving habits.</span>
+            </li>
+            <li>
+              <span class="check">✓</span>
+              <span><strong>Built for scale</strong> — whether managing ₹10 000 or ₹10 000 000, the system handles it with ease.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="about-visual reveal">
+          <div class="about-card">
+            <div class="ac-icon purple">🎯</div>
+            <div class="ac-body">
+              <h4>Problem we solve</h4>
+              <p>Funds often go to well-connected individuals rather than the most needy. We replace connections with data-driven, transparent criteria.</p>
+            </div>
+          </div>
+          <div class="about-card">
+            <div class="ac-icon blue">💡</div>
+            <div class="ac-body">
+              <h4>Our solution</h4>
+              <p>A three-tier platform with role-based access, immutable audit logs, and a priority engine that objectively ranks aid applications.</p>
+            </div>
+          </div>
+          <div class="about-card">
+            <div class="ac-icon pink">🌱</div>
+            <div class="ac-body">
+              <h4>Long-term impact</h4>
+              <p>By building donor trust through transparency, we create a virtuous cycle that grows the welfare pool year after year.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════ TESTIMONIALS ═══ -->
+  <section class="testimonials-section" id="testimonials">
+    <div class="container">
+      <div class="section-tag">Testimonials</div>
+      <h2 class="section-title">Trusted by <span>donors &amp; beneficiaries</span></h2>
+      <p class="section-sub">
+        Real stories from people whose lives were changed by transparent, fair welfare funding.
+      </p>
+
+      <div class="testimonials-grid">
+        <div class="testi-card reveal">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-text">"For the first time I can see exactly how my donation is used. The real-time dashboard gave me confidence to increase my monthly contribution by 3×."</p>
+          <div class="testi-author">
+            <div class="testi-avatar a1">👨</div>
+            <div>
+              <div class="testi-name">Rahul Sharma</div>
+              <div class="testi-role">Recurring Donor, Mumbai</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card reveal">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-text">"I applied for aid after losing my job. The application process was straightforward and within two weeks I received the approved funds. Truly life-changing."</p>
+          <div class="testi-author">
+            <div class="testi-avatar a2">👩</div>
+            <div>
+              <div class="testi-name">Priya Verma</div>
+              <div class="testi-role">Aid Recipient, Delhi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card reveal">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-text">"Managing hundreds of applications used to take weeks. With FinWelfare the admin panel cuts our review time by 70% and removes any chance of bias."</p>
+          <div class="testi-author">
+            <div class="testi-avatar a3">👨‍💼</div>
+            <div>
+              <div class="testi-name">Anand Kulkarni</div>
+              <div class="testi-role">NGO Administrator, Pune</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card reveal">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-text">"Our organisation switched to FinWelfare six months ago. Donor retention improved by 40% simply because people trust the transparent reporting."</p>
+          <div class="testi-author">
+            <div class="testi-avatar a4">👩‍💼</div>
+            <div>
+              <div class="testi-name">Sunita Patel</div>
+              <div class="testi-role">Welfare Trust Director, Ahmedabad</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card reveal">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-text">"The priority-based fund allocation is brilliant. As a donor I know the most critical cases are funded first — not the ones with the right contacts."</p>
+          <div class="testi-author">
+            <div class="testi-avatar a5">👨‍🏫</div>
+            <div>
+              <div class="testi-name">Vikram Nair</div>
+              <div class="testi-role">Corporate Donor, Bengaluru</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card reveal">
+          <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testi-text">"Receiving the funds was one thing — but the SMS updates and transparent audit trail gave my family peace of mind throughout the entire process."</p>
+          <div class="testi-author">
+            <div class="testi-avatar a6">👩‍🦱</div>
+            <div>
+              <div class="testi-name">Meena Devi</div>
+              <div class="testi-role">Beneficiary, Jaipur</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ CTA BANNER ═══ -->
+  <section class="cta-banner">
+    <div class="container">
+      <h2>Ready to make welfare <span style="background: linear-gradient(135deg,#667eea,#f093fb); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">transparent</span>?</h2>
+      <p>Join thousands of donors and beneficiaries building a fairer welfare ecosystem.</p>
+      <div class="cta-banner-btns">
+        <a href="login.html" class="btn-primary">🚀 Get Started Free</a>
+        <a href="login.html" class="btn-secondary">🔑 Login to Dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════ FOOTER ═══ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-brand">
+          <div class="brand-icon">💰</div>
+          FinWelfare
+        </a>
+        <p>Empowering transparent social welfare funding through technology, fairness, and accountability.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn" aria-label="Twitter">🐦</a>
+          <a href="#" class="social-btn" aria-label="LinkedIn">💼</a>
+          <a href="#" class="social-btn" aria-label="GitHub">🐙</a>
+          <a href="#" class="social-btn" aria-label="Instagram">📷</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="login.html">Get Started</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Roles</h4>
+        <ul>
+          <li><a href="login.html">Donor Portal</a></li>
+          <li><a href="login.html">Beneficiary Portal</a></li>
+          <li><a href="login.html">Admin Panel</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
       </div>
     </div>
 
-    <!-- Call to action -->
-    <a href="/login.html" class="cta-btn">Get Started – Sign In / Register</a>
-
-    <p class="footer-note">Secure · Transparent · Impactful</p>
-  </div>
+    <div class="footer-bottom">
+      <p>© 2025 FinWelfare. All rights reserved. Built with ❤️ for social good.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
-    // Particle background
+    /* ── Particle background ── */
     (function () {
       const container = document.getElementById('particles');
       const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#a78bfa'];
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 25; i++) {
         const el = document.createElement('div');
         el.className = 'particle';
-        const size = Math.random() * 60 + 20;
-        el.style.cssText = `
-          width: ${size}px; height: ${size}px;
-          left: ${Math.random() * 100}%;
-          background: ${colors[Math.floor(Math.random() * colors.length)]};
-          animation-duration: ${Math.random() * 15 + 10}s;
-          animation-delay: ${Math.random() * 10}s;
-          filter: blur(${Math.random() * 4 + 1}px);
-        `;
+        const size = Math.random() * 55 + 15;
+        el.style.cssText = [
+          'width:' + size + 'px',
+          'height:' + size + 'px',
+          'left:' + (Math.random() * 100) + '%',
+          'background:' + colors[Math.floor(Math.random() * colors.length)],
+          'animation-duration:' + (Math.random() * 15 + 10) + 's',
+          'animation-delay:' + (Math.random() * 10) + 's',
+          'filter:blur(' + (Math.random() * 4 + 1) + 'px)'
+        ].join(';');
         container.appendChild(el);
       }
     })();
+
+    /* ── Navbar scroll shrink ── */
+    window.addEventListener('scroll', function () {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    /* ── Mobile hamburger ── */
+    document.getElementById('hamburger').addEventListener('click', function () {
+      this.classList.toggle('open');
+      document.getElementById('navLinks').classList.toggle('open');
+      document.getElementById('navCta').classList.toggle('open');
+    });
+
+    /* ── Close mobile menu on link click ── */
+    document.querySelectorAll('.nav-links a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        document.getElementById('hamburger').classList.remove('open');
+        document.getElementById('navLinks').classList.remove('open');
+        document.getElementById('navCta').classList.remove('open');
+      });
+    });
+
+    /* ── Scroll-reveal ── */
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(function (el) { revealObserver.observe(el); });
+
+    /* ── Animated counters ── */
+    function animateCounter(el) {
+      var target = parseInt(el.dataset.target, 10);
+      var isRupee = el.dataset.format === 'rupee' || el.textContent.startsWith('₹');
+      var isPercent = el.dataset.format === 'percent';
+      var duration = 1800;
+      var start = performance.now();
+      function step(now) {
+        var progress = Math.min((now - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var value = Math.round(eased * target);
+        if (isRupee) {
+          el.textContent = '₹' + value.toLocaleString('en-IN');
+        } else if (isPercent) {
+          el.textContent = value + '%';
+        } else {
+          el.textContent = value.toLocaleString('en-IN');
+        }
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    var counterObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.stat-value[data-target]').forEach(function (el) {
+      counterObserver.observe(el);
+    });
+
+    /* ── Smooth scroll for anchor links ── */
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var href = this.getAttribute('href');
+        if (!href || href === '#') return;
+        try {
+          var target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            var offset = 72;
+            var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({ top: top, behavior: 'smooth' });
+          }
+        } catch (err) {
+          /* ignore invalid selectors */
+        }
+      });
+    });
   </script>
 </body>
 </html>
