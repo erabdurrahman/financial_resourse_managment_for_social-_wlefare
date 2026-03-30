@@ -27,6 +27,7 @@
 
     <div class="nav-cta" id="navCta">
       <a href="login.html" class="btn-nav-login">Login</a>
+      <button class="btn-nav-donate" id="navDonateBtn" aria-label="Donate Now">❤️ Donate Now</button>
       <a href="login.html" class="btn-nav-start">Get Started</a>
     </div>
 
@@ -64,6 +65,9 @@
         <a href="login.html" class="btn-primary">
           🚀 Get Started — It's Free
         </a>
+        <button class="btn-donate-hero" id="heroDonateBtn" aria-label="Donate Now">
+          ❤️ Donate Now
+        </button>
         <a href="#how-it-works" class="btn-secondary">
           ▶ See How It Works
         </a>
@@ -392,6 +396,71 @@
     </div>
   </footer>
 
+  <!-- ════════════════════════════════════════ DONATE NOW MODAL ═══ -->
+  <div class="donate-modal-overlay" id="donateModal" role="dialog" aria-modal="true" aria-labelledby="donateModalTitle">
+    <div class="donate-modal">
+      <button class="donate-modal-close" id="donateModalClose" aria-label="Close donation form">✕</button>
+
+      <div class="donate-modal-header">
+        <div class="donate-modal-icon">❤️</div>
+        <h2 id="donateModalTitle">Make a Donation</h2>
+        <p>Your contribution helps change lives. No account required!</p>
+      </div>
+
+      <!-- Success message (hidden by default) -->
+      <div class="donate-success" id="donateSuccess" style="display:none;">
+        <div class="donate-success-icon">🎉</div>
+        <h3>Thank You!</h3>
+        <p id="donateSuccessMsg">Your donation has been received. You're making a real difference!</p>
+        <button class="donate-btn-close-success" id="donateSuccessClose">Close</button>
+      </div>
+
+      <!-- Donation form -->
+      <form id="donateForm" novalidate>
+        <div class="donate-form-group">
+          <label for="donateFullName">Full Name <span class="donate-required">*</span></label>
+          <input type="text" id="donateFullName" name="full_name" placeholder="Enter your full name" maxlength="100" autocomplete="name" />
+          <span class="donate-error" id="errFullName"></span>
+        </div>
+
+        <div class="donate-form-group">
+          <label for="donateEmail">Email Address <span class="donate-required">*</span></label>
+          <input type="email" id="donateEmail" name="email" placeholder="you@example.com" maxlength="100" autocomplete="email" />
+          <span class="donate-error" id="errEmail"></span>
+        </div>
+
+        <div class="donate-form-group">
+          <label for="donateAmount">Donation Amount (₹) <span class="donate-required">*</span></label>
+          <div class="donate-quick-amounts">
+            <button type="button" class="donate-quick-btn" data-amount="500">₹500</button>
+            <button type="button" class="donate-quick-btn" data-amount="1000">₹1,000</button>
+            <button type="button" class="donate-quick-btn" data-amount="2500">₹2,500</button>
+            <button type="button" class="donate-quick-btn" data-amount="5000">₹5,000</button>
+          </div>
+          <input type="number" id="donateAmount" name="amount" placeholder="Enter custom amount" min="1" step="1" />
+          <span class="donate-error" id="errAmount"></span>
+        </div>
+
+        <div class="donate-form-group">
+          <label for="donateMessage">Message <span class="donate-optional">(optional)</span></label>
+          <textarea id="donateMessage" name="message" placeholder="Share a message of support..." rows="3" maxlength="500"></textarea>
+        </div>
+
+        <button type="submit" class="donate-submit-btn" id="donateSubmitBtn">
+          <span id="donateSubmitText">❤️ Donate Now</span>
+          <span id="donateSubmitSpinner" style="display:none;">⏳ Processing…</span>
+        </button>
+
+        <p class="donate-login-hint">
+          Already have an account?
+          <a href="login.html" class="donate-login-link">Login for faster checkout &amp; donation history</a>
+        </p>
+
+        <p class="donate-security-note">🔒 Your information is safe and securely processed.</p>
+      </form>
+    </div>
+  </div>
+
   <script>
     /* ── Particle background ── */
     (function () {
@@ -499,6 +568,150 @@
         }
       });
     });
+
+    /* ══════════════════════════════════════════
+       Donate Now Modal Logic
+    ══════════════════════════════════════════ */
+    (function () {
+      var modal   = document.getElementById('donateModal');
+      var form    = document.getElementById('donateForm');
+      var success = document.getElementById('donateSuccess');
+
+      /* Open modal */
+      function openModal() {
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+        document.getElementById('donateFullName').focus();
+      }
+
+      /* Close modal */
+      function closeModal() {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+        form.reset();
+        success.style.display = 'none';
+        form.style.display = '';
+        clearErrors();
+        document.querySelectorAll('.donate-quick-btn').forEach(function (b) {
+          b.classList.remove('active');
+        });
+      }
+
+      /* Wire open buttons */
+      document.getElementById('navDonateBtn').addEventListener('click', openModal);
+      document.getElementById('heroDonateBtn').addEventListener('click', openModal);
+
+      /* Wire close buttons */
+      document.getElementById('donateModalClose').addEventListener('click', closeModal);
+      document.getElementById('donateSuccessClose').addEventListener('click', closeModal);
+
+      /* Close on backdrop click */
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+
+      /* Close on Escape key */
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+      });
+
+      /* Quick-amount buttons */
+      document.querySelectorAll('.donate-quick-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.donate-quick-btn').forEach(function (b) {
+            b.classList.remove('active');
+          });
+          this.classList.add('active');
+          document.getElementById('donateAmount').value = this.dataset.amount;
+        });
+      });
+
+      /* Clear error for a field on input */
+      ['donateFullName', 'donateEmail', 'donateAmount'].forEach(function (id) {
+        document.getElementById(id).addEventListener('input', function () {
+          clearError(id === 'donateFullName' ? 'errFullName'
+                   : id === 'donateEmail'    ? 'errEmail'
+                   : 'errAmount');
+        });
+      });
+
+      function showError(id, msg) {
+        var el = document.getElementById(id);
+        if (el) { el.textContent = msg; }
+      }
+      function clearError(id) {
+        var el = document.getElementById(id);
+        if (el) { el.textContent = ''; }
+      }
+      function clearErrors() {
+        ['errFullName', 'errEmail', 'errAmount'].forEach(clearError);
+      }
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      /* Form submission */
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearErrors();
+
+        var fullName = document.getElementById('donateFullName').value.trim();
+        var email    = document.getElementById('donateEmail').value.trim();
+        var amount   = document.getElementById('donateAmount').value.trim();
+        var message  = document.getElementById('donateMessage').value.trim();
+
+        var valid = true;
+        if (!fullName) {
+          showError('errFullName', 'Full name is required.');
+          valid = false;
+        }
+        if (!email || !isValidEmail(email)) {
+          showError('errEmail', 'A valid email address is required.');
+          valid = false;
+        }
+        if (!amount || parseFloat(amount) <= 0) {
+          showError('errAmount', 'Please enter a valid donation amount.');
+          valid = false;
+        }
+        if (!valid) return;
+
+        /* Disable submit while processing */
+        var submitBtn     = document.getElementById('donateSubmitBtn');
+        var submitText    = document.getElementById('donateSubmitText');
+        var submitSpinner = document.getElementById('donateSubmitSpinner');
+        submitBtn.disabled    = true;
+        submitText.style.display    = 'none';
+        submitSpinner.style.display = '';
+
+        fetch('/api/donations/guest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name: fullName, email: email, amount: parseFloat(amount), message: message })
+        })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (result) {
+          submitBtn.disabled    = false;
+          submitText.style.display    = '';
+          submitSpinner.style.display = 'none';
+          if (result.ok) {
+            form.style.display = 'none';
+            document.getElementById('donateSuccessMsg').textContent =
+              'Your donation of ₹' + parseFloat(amount).toLocaleString('en-IN') +
+              ' has been received. Thank you, ' + fullName + '!';
+            success.style.display = '';
+          } else {
+            showError('errAmount', result.data.message || 'Donation failed. Please try again.');
+          }
+        })
+        .catch(function () {
+          submitBtn.disabled    = false;
+          submitText.style.display    = '';
+          submitSpinner.style.display = 'none';
+          showError('errAmount', 'Network error. Please check your connection and try again.');
+        });
+      });
+    })();
   </script>
 </body>
 </html>

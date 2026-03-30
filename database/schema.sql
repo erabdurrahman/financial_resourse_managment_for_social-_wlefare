@@ -15,10 +15,13 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Donations table: tracks all monetary donations made by donors
+-- Donations table: tracks all monetary donations made by donors or guests
+-- donor_id is NULL for guest (unauthenticated) donations; guest_name/guest_email hold their details
 CREATE TABLE donations (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  donor_id INT NOT NULL,
+  donor_id INT DEFAULT NULL,
+  guest_name VARCHAR(100) DEFAULT NULL,
+  guest_email VARCHAR(100) DEFAULT NULL,
   amount DECIMAL(10, 2) NOT NULL,
   message TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

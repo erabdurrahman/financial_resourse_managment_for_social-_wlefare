@@ -1,8 +1,11 @@
 // Donation routes - donor-only endpoints for managing contributions
 const express = require('express');
 const router = express.Router();
-const { addDonation, getMyDonations, getTotalFunds } = require('../controllers/donationController');
+const { guestDonation, addDonation, getMyDonations, getTotalFunds } = require('../controllers/donationController');
 const { authenticate, authorize } = require('../middleware/auth');
+
+// POST /api/donations/guest  - submit a donation without authentication (guest users)
+router.post('/guest', guestDonation);
 
 // POST /api/donations       - submit a new donation (donors only)
 router.post('/', authenticate, authorize('donor'), addDonation);
