@@ -27,7 +27,7 @@ const guestDonation = async (req, res) => {
 
     const sanitizedName  = full_name.trim().substring(0, 100);
     const sanitizedEmail = email.trim().substring(0, 100);
-    const sanitizedMsg   = message ? String(message).trim() : '';
+    const sanitizedMsg   = message ? String(message).trim().substring(0, 500) : '';
 
     const [result] = await db.query(
       'INSERT INTO donations (donor_id, guest_name, guest_email, amount, message) VALUES (NULL, ?, ?, ?, ?)',
