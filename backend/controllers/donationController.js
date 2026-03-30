@@ -1,6 +1,48 @@
 // Donation Controller - handles donor fund contributions
 const db = require('../config/db');
 
+/* Basic email validation helper */
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/**
+ * guestDonation - records a donation from an unauthenticated (guest) user
+ * Body: { full_name, email, amount, message? }
+ * No authentication required.
+ */
+const guestDonation = async (req, res) => {
+  try {
+    const { full_name, email, amount, message } = req.body;
+
+    if (!full_name || typeof full_name !== 'string' || full_name.trim().length === 0) {
+      return res.status(400).json({ message: 'Full name is required' });
+    }
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ message: 'A valid email address is required' });
+    }
+    if (!amount || parseFloat(amount) <= 0) {
+      return res.status(400).json({ message: 'Valid donation amount is required' });
+    }
+
+    const sanitizedName  = full_name.trim().substring(0, 100);
+    const sanitizedEmail = email.trim().substring(0, 100);
+    const sanitizedMsg   = message ? String(message).trim().substring(0, 500) : '';
+
+    const [result] = await db.query(
+      'INSERT INTO donations (donor_id, guest_name, guest_email, amount, message) VALUES (NULL, ?, ?, ?, ?)',
+      [sanitizedName, sanitizedEmail, parseFloat(amount), sanitizedMsg]
+    );
+
+    res.status(201).json({
+      message: 'Thank you for your donation!',
+      donationId: result.insertId
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 /**
  * addDonation - records a new donation from the authenticated donor
  * Body: { amount, message? }
@@ -67,4 +109,4 @@ const getTotalFunds = async (req, res) => {
   }
 };
 
-module.exports = { addDonation, getMyDonations, getTotalFunds };
+module.exports = { guestDonation, addDonation, getMyDonations, getTotalFunds };
