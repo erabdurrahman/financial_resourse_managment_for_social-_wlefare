@@ -184,11 +184,9 @@ const getDashboardStats = async (req, res) => {
 const getAllDonations = async (req, res) => {
   try {
     const [donations] = await db.query(
-      `SELECT d.*,
-              COALESCE(u.name,  d.guest_name)  AS donor_name,
-              COALESCE(u.email, d.guest_email) AS donor_email
+      `SELECT d.*, u.name AS donor_name, u.email AS donor_email
        FROM donations d
-       LEFT JOIN users u ON d.donor_id = u.id
+       JOIN users u ON d.donor_id = u.id
        ORDER BY d.created_at DESC`
     );
     res.json(donations);

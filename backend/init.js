@@ -40,13 +40,11 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS donations (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  donor_id     INT            DEFAULT NULL,
-  guest_name   VARCHAR(100)   DEFAULT NULL,
-  guest_email  VARCHAR(100)   DEFAULT NULL,
-  amount       DECIMAL(10, 2) NOT NULL,
-  message      TEXT,
-  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  donor_id   INT            NOT NULL,
+  amount     DECIMAL(10, 2) NOT NULL,
+  message    TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (donor_id) REFERENCES users(id)
 );
 
