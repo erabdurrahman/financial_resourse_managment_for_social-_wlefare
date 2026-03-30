@@ -309,7 +309,7 @@ function logout() {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function formatCurrency(amount) {
-  return '$' + parseFloat(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return '₹' + parseFloat(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatDate(str) {
