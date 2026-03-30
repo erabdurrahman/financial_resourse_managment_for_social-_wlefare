@@ -64,7 +64,7 @@
         <div class="stat-card">
           <div class="stat-icon stat-green">💚</div>
           <div class="stat-info">
-            <div class="stat-value" id="stat-total">$0</div>
+            <div class="stat-value" id="stat-total">₹0</div>
             <div class="stat-label">Total Donated</div>
           </div>
         </div>
@@ -78,7 +78,7 @@
         <div class="stat-card">
           <div class="stat-icon stat-purple">📈</div>
           <div class="stat-info">
-            <div class="stat-value" id="stat-avg">$0</div>
+            <div class="stat-value" id="stat-avg">₹0</div>
             <div class="stat-label">Average Donation</div>
           </div>
         </div>
@@ -109,27 +109,27 @@
           <div class="impact-panel">
             <h3>💡 Your Impact</h3>
             <ul class="impact-list">
-              <li>🏠 <strong>$500</strong> can cover one month's rent for a family</li>
-              <li>🏥 <strong>$1,000</strong> can help with basic medical expenses</li>
-              <li>📚 <strong>$200</strong> provides school supplies for 3 children</li>
-              <li>🍽️ <strong>$100</strong> provides meals for a family for a month</li>
+              <li>🏠 <strong>₹41,500</strong> can cover one month's rent for a family</li>
+              <li>🏥 <strong>₹83,000</strong> can help with basic medical expenses</li>
+              <li>📚 <strong>₹16,600</strong> provides school supplies for 3 children</li>
+              <li>🍽️ <strong>₹8,300</strong> provides meals for a family for a month</li>
             </ul>
           </div>
 
           <!-- Donation form -->
           <form id="donationForm" onsubmit="handleDonate(event)">
             <div class="form-group">
-              <label>Donation Amount (USD)</label>
+              <label>Donation Amount (INR)</label>
               <div class="amount-input-wrap">
-                <span class="currency-prefix">$</span>
+                <span class="currency-prefix">₹</span>
                 <input type="number" id="donationAmount" placeholder="0.00" min="1" step="0.01" required />
               </div>
               <!-- Quick amount buttons -->
               <div class="quick-amounts">
-                <button type="button" class="quick-btn" onclick="setAmount(100, event)">$100</button>
-                <button type="button" class="quick-btn" onclick="setAmount(500, event)">$500</button>
-                <button type="button" class="quick-btn" onclick="setAmount(1000, event)">$1,000</button>
-                <button type="button" class="quick-btn" onclick="setAmount(5000, event)">$5,000</button>
+                <button type="button" class="quick-btn" onclick="setAmount(100, event)">₹100</button>
+                <button type="button" class="quick-btn" onclick="setAmount(500, event)">₹500</button>
+                <button type="button" class="quick-btn" onclick="setAmount(1000, event)">₹1,000</button>
+                <button type="button" class="quick-btn" onclick="setAmount(5000, event)">₹5,000</button>
               </div>
             </div>
             <div class="form-group">
