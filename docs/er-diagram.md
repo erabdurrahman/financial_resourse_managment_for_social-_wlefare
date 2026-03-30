@@ -18,7 +18,7 @@ erDiagram
     DONATIONS {
         int id PK
         int donor_id FK
-        decimal(10_2) amount
+        decimal amount "DECIMAL(10,2)"
         text message
         timestamp created_at
     }
@@ -26,20 +26,20 @@ erDiagram
     APPLICATIONS {
         int id PK
         int beneficiary_id FK
-        varchar(30) phone
+        varchar phone
         text address
-        decimal(12_2) income
+        decimal income "DECIMAL(12,2) monthly USD"
         int family_members
-        varchar(50) employment_status
-        decimal(10_2) amount
+        varchar employment_status
+        decimal amount "DECIMAL(10,2) requested"
         enum category "Medical | Education | Emergency | Other"
         text reason
         enum urgency "Low | Medium | High | Critical"
         text documents_path
-        int priority_score
+        int priority_score "0-100 server-calculated"
         enum priority_level "Low | Medium | High"
         enum status "pending | approved | rejected"
-        decimal(10_2) amount_allocated
+        decimal amount_allocated "DECIMAL(10,2)"
         int reviewed_by FK
         timestamp reviewed_at
         timestamp created_at
@@ -50,7 +50,7 @@ erDiagram
         int application_id FK
         int beneficiary_id FK
         int donor_allocation_id
-        decimal(10_2) amount
+        decimal amount "DECIMAL(10,2)"
         enum type "allocation | donation"
         timestamp created_at
     }
