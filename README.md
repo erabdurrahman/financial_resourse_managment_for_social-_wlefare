@@ -11,20 +11,21 @@ A full-stack web application that manages financial resources for social welfare
 3. [Technologies Used & Why](#technologies-used--why)
 4. [Database Connection — How It Works](#database-connection--how-it-works)
 5. [Database Schema — Tables & Relationships](#database-schema--tables--relationships)
-6. [Backend File-by-File Explanation](#backend-file-by-file-explanation)
+6. [Flow Diagrams](#flow-diagrams)
+7. [Backend File-by-File Explanation](#backend-file-by-file-explanation)
    - [server.js — Application Entry Point](#serverjs--application-entry-point)
    - [config/db.js — Database Pool](#configdbjs--database-pool)
    - [middleware/auth.js — Authentication Guard](#middlewareauthjs--authentication-guard)
    - [routes/ — URL Routing Layer](#routes--url-routing-layer)
    - [controllers/ — Business Logic Layer](#controllers--business-logic-layer)
    - [init.js — Database Seeder](#initjs--database-seeder)
-7. [Frontend File-by-File Explanation](#frontend-file-by-file-explanation)
-8. [All API Endpoints (with Examples)](#all-api-endpoints-with-examples)
-9. [Priority Scoring Algorithm](#priority-scoring-algorithm)
-10. [Security Implementation](#security-implementation)
-11. [Request–Response Flow (End to End)](#requestresponse-flow-end-to-end)
-12. [Quick Start Guide](#quick-start-guide)
-13. [Demo Credentials](#demo-credentials)
+8. [Frontend File-by-File Explanation](#frontend-file-by-file-explanation)
+9. [All API Endpoints (with Examples)](#all-api-endpoints-with-examples)
+10. [Priority Scoring Algorithm](#priority-scoring-algorithm)
+11. [Security Implementation](#security-implementation)
+12. [Request–Response Flow (End to End)](#requestresponse-flow-end-to-end)
+13. [Quick Start Guide](#quick-start-guide)
+14. [Demo Credentials](#demo-credentials)
 
 ---
 
@@ -202,6 +203,26 @@ try {
 ```
 
 This way, any misconfiguration is caught immediately at startup rather than silently failing on the first real request.
+
+---
+
+## Flow Diagrams
+
+Visual representations of system workflows are available in the [`docs/`](docs/) folder:
+
+- **[`docs/flow-diagram.md`](docs/flow-diagram.md)** — Mermaid flow diagrams covering:
+  - Overall system flow (all three user roles)
+  - User registration & authentication flow
+  - Donation submission flow
+  - Beneficiary application submission flow
+  - Priority scoring algorithm flow
+  - Admin review & fund allocation flow
+  - Fund pool calculation flow
+  - API request–response flow
+
+- **[`docs/flow-diagram.png`](docs/flow-diagram.png)** — Visual image of the overall system flow
+
+- **[`docs/er-diagram.md`](docs/er-diagram.md)** — Entity-Relationship diagram
 
 ---
 
