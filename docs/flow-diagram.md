@@ -10,8 +10,7 @@
 
 ```mermaid
 flowchart TD
-    User([👤 User Visits System]) --> Auth{Authenticated?}
-    Auth -- No --> Login[Login / Register Page]
+    User([👤 User Visits System]) --> Login[Login / Register Page]
     Login --> Creds[Enter Credentials]
     Creds --> Verify{Valid?}
     Verify -- No --> ErrMsg[Show Error Message]
