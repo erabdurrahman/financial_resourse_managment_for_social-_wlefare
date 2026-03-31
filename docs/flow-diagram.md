@@ -1,9 +1,6 @@
 # Flow Diagram
 
 ## Financial Resource Management System for Social Welfare  d
-
-![Overall System Flow Diagram](flow-diagram.png)
-
 ---
 
 ## 1. Overall System Flow
