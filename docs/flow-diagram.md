@@ -42,9 +42,9 @@ flowchart TD
 
     A1 --> End([🏁 Session Ends / User Logs Out])
     A3 --> End
-    A4 --> End
     D2 --> End
     D3 --> End
+    B1 --> End
     B2 --> End
     B3 --> End
     FundPool --> End
