@@ -222,8 +222,6 @@ Visual representations of system workflows are available in the [`docs/`](docs/)
 
 - **[`docs/flow-diagram.png`](docs/flow-diagram.png)** — Visual image of the overall system flow
 
-- **[`docs/system-flow.png`](docs/system-flow.png)** — Comprehensive overall system flow diagram showing all actors, swim lanes (Admin / Donor / Beneficiary), the central Fund Pool, backend API & middleware layer, priority scoring algorithm, and database tables in a single view
-
 - **[`docs/er-diagram.md`](docs/er-diagram.md)** — Entity-Relationship diagram
 
 ---
