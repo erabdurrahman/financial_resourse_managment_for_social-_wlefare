@@ -1,7 +1,4 @@
-# Flow Diagram
 
-## Financial Resource Management System for Social Welfare  d
----
 
 ## 1. Overall System Flow
 
@@ -48,6 +45,3 @@ flowchart TD
     RejectApp --> End
 ```
 
----
-
-\
