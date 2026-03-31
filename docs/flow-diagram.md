@@ -43,16 +43,6 @@ flowchart TD
 
     D1 --> FundPool[(💵 Fund Pool\nAvailable Balance)]
     AllocFunds --> FundPool
-
-    A1 --> End([🏁 Session Ends / User Logs Out])
-    A3 --> End
-    A4 --> End
-    D2 --> End
-    D3 --> End
-    B2 --> End
-    B3 --> End
-    FundPool --> End
-    RejectApp --> End
 ```
 
 ---
@@ -89,12 +79,6 @@ flowchart TD
     Redirect -- Admin --> AdminDash[/admin.html/]
     Redirect -- Donor --> DonorDash[/donor.html/]
     Redirect -- Beneficiary --> BenefDash[/beneficiary.html/]
-
-    AdminDash --> AuthEnd([🏁 User Session Active])
-    DonorDash --> AuthEnd
-    BenefDash --> AuthEnd
-    DenyAdmin --> AuthEnd
-    Block --> AuthEnd
 ```
 
 ---
@@ -120,8 +104,6 @@ flowchart TD
     UpdatePool --> Success[✅ Donation Successful\nShow Confirmation]
     Success --> RefreshHistory[Reload Donation History]
     RefreshHistory --> Dashboard
-
-    Dashboard --> DonorEnd([🏁 Donation Flow Complete])
 ```
 
 ---
@@ -152,10 +134,6 @@ flowchart TD
     StatusPoll -- pending --> Waiting[⏳ Awaiting Review]
     StatusPoll -- approved --> Approved[✅ Approved\nFunds Allocated]
     StatusPoll -- rejected --> Rejected[❌ Application Rejected]
-
-    Waiting --> AppEnd([🏁 Application Flow Complete])
-    Approved --> AppEnd
-    Rejected --> AppEnd
 ```
 
 ---
@@ -209,8 +187,6 @@ flowchart TD
     High --> SavePriority[(Save priority_score\n& priority_level\nto DB)]
     Medium --> SavePriority
     Low --> SavePriority
-
-    SavePriority --> ScoreEnd([🏁 Priority Score Calculated & Saved])
 ```
 
 ---
@@ -243,8 +219,6 @@ flowchart TD
     NotifySuccess --> RefreshDash[Refresh Dashboard]
     NotifyRejected --> RefreshDash
     RefreshDash --> Dashboard
-
-    Dashboard --> AdminEnd([🏁 Review Complete / Admin Session Active])
 ```
 
 ---
@@ -263,7 +237,6 @@ flowchart LR
     TotalAllocations --> Calc
 
     Calc --> Display[📊 Displayed on\nAll Dashboards]
-    Display --> FundEnd([🏁 Fund Balance Updated])
 ```
 
 ---
@@ -294,9 +267,4 @@ flowchart TD
     AuthCtrl --> DBQuery
     FormatRes -->|JSON| Client
     DBError -->|JSON Error| Client
-
-    Client --> APIEnd([🏁 Request–Response Cycle Complete])
-    Reject401 --> APIEnd
-    Reject403 --> APIEnd
-    DBError --> APIEnd
 ```
