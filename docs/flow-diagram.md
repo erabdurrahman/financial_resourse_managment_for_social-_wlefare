@@ -17,29 +17,25 @@ flowchart TD
     ErrMsg --> Login
     Verify -- Yes --> Role{User Role?}
 
-    Login -->|New User| RegEndpoint["POST /api/auth/register"]
-    Login -->|Existing User| LoginEndpoint["POST /api/auth/login"]
-
     Role -- Admin --> AdminDash[🛠️ Admin Dashboard]
     Role -- Donor --> DonorDash[💰 Donor Dashboard]
     Role -- Beneficiary --> BenefDash[📄 Beneficiary Dashboard]
 
-    AdminDash --> A1["View Statistics\nGET /api/admin/stats"]
-    AdminDash --> A2["Review Applications\nGET /api/admin/applications"]
-    AdminDash --> A3["Manage Users\nGET /api/admin/users"]
-    AdminDash --> A4["View All Donations\nGET /api/admin/donations"]
+    AdminDash --> A1[View Statistics]
+    AdminDash --> A2[Review Applications]
+    AdminDash --> A3[Manage Users]
 
-    DonorDash --> D1["Submit Donation\nPOST /api/donations"]
-    DonorDash --> D2["View Donation History\nGET /api/donations/my"]
-    DonorDash --> D3["View Fund Statistics\nGET /api/donations/total"]
+    DonorDash --> D1[Submit Donation]
+    DonorDash --> D2[View Donation History]
+    DonorDash --> D3[View Fund Statistics]
 
-    BenefDash --> B1["Submit Application\nPOST /api/applications"]
-    BenefDash --> B2["Track Application Status\nGET /api/applications/my"]
-    BenefDash --> B3["View Application Details\nGET /api/applications/:id"]
+    BenefDash --> B1[Submit Application]
+    BenefDash --> B2[Track Application Status]
+    BenefDash --> B3[View Application Details]
 
     A2 --> Approve{Approve / Reject?}
-    Approve -- Approve --> AllocFunds["Allocate Funds\nPUT /api/admin/applications/:id/approve"]
-    Approve -- Reject --> RejectApp["Mark Application Rejected\nPUT /api/admin/applications/:id/reject"]
+    Approve -- Approve --> AllocFunds[Allocate Funds\nCreate Transaction Record]
+    Approve -- Reject --> RejectApp[Mark Application Rejected]
 
     D1 --> FundPool[(💵 Fund Pool\nAvailable Balance)]
     AllocFunds --> FundPool
