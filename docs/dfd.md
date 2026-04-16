@@ -1,5 +1,9 @@
 # Data Flow Diagrams (DFD)
 
+> **Visual version:** Open [`dfd-colorful.html`](dfd-colorful.html) in any browser for the
+> full-colour, SVG-based Zero Level and Level 1 DFD diagrams with coloured entities,
+> gradient process ovals, data-store symbols, and labelled arrows.
+
 ## Zero Level DFD (Context Diagram)
 
 The entire system is represented as a single process with three external entities.

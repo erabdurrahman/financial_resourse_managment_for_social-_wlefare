@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DFD – Financial Resource Management for Social Welfare</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #e8eaf6 0%, #e0f2f1 100%);
+      padding: 28px 20px 50px;
+      min-height: 100vh;
+    }
+    .page-title {
+      text-align: center;
+      color: #1a237e;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .page-subtitle {
+      text-align: center;
+      color: #37474f;
+      font-size: 14px;
+      margin-bottom: 36px;
+    }
+    .section {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.13);
+      padding: 24px 24px 20px;
+      margin-bottom: 46px;
+      overflow-x: auto;
+    }
+    .section-title {
+      color: #1a237e;
+      font-size: 20px;
+      font-weight: 700;
+      border-left: 5px solid #3f51b5;
+      padding-left: 12px;
+      margin-bottom: 6px;
+    }
+    .section-desc {
+      color: #546e7a;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+    .legend-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: #f3f4f8;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #333;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .swatch { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; }
+    .swatch-oval { width: 22px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+    .swatch-ds {
+      width: 22px; height: 14px;
+      border-top: 2px solid #555; border-bottom: 2px solid #555; border-left: 2px solid #555;
+      flex-shrink: 0;
+      background: #fffde7;
+    }
+    svg text { font-family: 'Segoe UI', Arial, sans-serif; }
+  </style>
+</head>
+<body>
+
+<div class="page-title">Data Flow Diagrams (DFD)</div>
+<div class="page-subtitle">Financial Resource Management for Social Welfare System</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZERO LEVEL DFD  (Context Diagram)
+═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2 class="section-title">Zero Level DFD — Context Diagram</h2>
+  <p class="section-desc">
+    The entire system is shown as a single process. Three external entities interact with it:
+    <strong>Admin</strong> (system manager), <strong>Donor</strong> (contributor), and
+    <strong>Beneficiary</strong> (recipient of aid).
+  </p>
+
+  <svg width="900" height="470" viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Arrow markers per colour -->
+      <marker id="z-arr-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0,10 3.5,0 7" fill="#C62828"/>
+      </marker>
+      <marker id="z-arr-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0,10 3.5,0 7" fill="#0277BD"/>
+      </marker>
+      <marker id="z-arr-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0,10 3.5,0 7" fill="#2E7D32"/>
+      </marker>
+      <!-- Drop-shadow filter -->
+      <filter id="z-shadow" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#00000028"/>
+      </filter>
+      <!-- Gold radial gradient for central process -->
+      <radialGradient id="z-gold" cx="50%" cy="38%" r="60%">
+        <stop offset="0%"   stop-color="#FFFDE7"/>
+        <stop offset="100%" stop-color="#F9A825"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Canvas background -->
+    <rect width="900" height="470" rx="10" fill="#FAFCFF"/>
+
+    <!-- ── Central Process oval ── -->
+    <ellipse cx="450" cy="228" rx="162" ry="98"
+             fill="url(#z-gold)" stroke="#F57F17" stroke-width="2.5"
+             filter="url(#z-shadow)"/>
+    <text x="450" y="200" text-anchor="middle" font-size="13" font-weight="700" fill="#4A2C00">Financial Resource</text>
+    <text x="450" y="218" text-anchor="middle" font-size="13" font-weight="700" fill="#4A2C00">Management for</text>
+    <text x="450" y="236" text-anchor="middle" font-size="13" font-weight="700" fill="#4A2C00">Social Welfare</text>
+    <text x="450" y="254" text-anchor="middle" font-size="13" font-weight="700" fill="#4A2C00">System</text>
+    <text x="450" y="274" text-anchor="middle" font-size="10" font-style="italic" fill="#795500">( P0 – Central Process )</text>
+
+    <!-- ══ ADMIN entity (LEFT, coral-red) ══ -->
+    <rect x="18" y="172" width="138" height="72" rx="9"
+          fill="#EF5350" stroke="#B71C1C" stroke-width="2.5" filter="url(#z-shadow)"/>
+    <text x="87" y="202" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">ADMIN</text>
+    <text x="87" y="222" text-anchor="middle" font-size="11" fill="#FFCDD2">System Manager</text>
+
+    <!-- ADMIN → System  (top arrow) -->
+    <line x1="156" y1="194" x2="290" y2="212"
+          stroke="#EF5350" stroke-width="2.2" marker-end="url(#z-arr-red)"/>
+    <text x="208" y="191" text-anchor="middle" font-size="9.5" fill="#B71C1C">Login Credentials,</text>
+    <text x="208" y="203" text-anchor="middle" font-size="9.5" fill="#B71C1C">User Mgmt Commands</text>
+
+    <!-- System → ADMIN  (bottom arrow) -->
+    <line x1="290" y1="248" x2="156" y2="232"
+          stroke="#EF5350" stroke-width="2.2" marker-end="url(#z-arr-red)"/>
+    <text x="208" y="262" text-anchor="middle" font-size="9.5" fill="#B71C1C">Dashboard Stats,</text>
+    <text x="208" y="274" text-anchor="middle" font-size="9.5" fill="#B71C1C">App &amp; User Lists</text>
+
+    <!-- ══ DONOR entity (TOP-RIGHT, sky-blue) ══ -->
+    <rect x="726" y="36" width="154" height="72" rx="9"
+          fill="#039BE5" stroke="#01579B" stroke-width="2.5" filter="url(#z-shadow)"/>
+    <text x="803" y="67" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">DONOR</text>
+    <text x="803" y="87" text-anchor="middle" font-size="11" fill="#B3E5FC">Contributor</text>
+
+    <!-- DONOR → System  (upper arrow) -->
+    <line x1="726" y1="65" x2="608" y2="162"
+          stroke="#039BE5" stroke-width="2.2" marker-end="url(#z-arr-blue)"/>
+    <text x="682" y="96"  text-anchor="middle" font-size="9.5" fill="#01579B">Donation Amount,</text>
+    <text x="682" y="108" text-anchor="middle" font-size="9.5" fill="#01579B">Message, Credentials</text>
+
+    <!-- System → DONOR  (lower arrow) -->
+    <line x1="613" y1="151" x2="726" y2="78"
+          stroke="#039BE5" stroke-width="2.2" marker-end="url(#z-arr-blue)"/>
+    <text x="706" y="140" text-anchor="middle" font-size="9.5" fill="#01579B">Donation History,</text>
+    <text x="706" y="152" text-anchor="middle" font-size="9.5" fill="#01579B">Fund Stats, Confirm</text>
+
+    <!-- ══ BENEFICIARY entity (BOTTOM-RIGHT, green) ══ -->
+    <rect x="726" y="362" width="154" height="72" rx="9"
+          fill="#43A047" stroke="#1B5E20" stroke-width="2.5" filter="url(#z-shadow)"/>
+    <text x="803" y="392" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">BENEFICIARY</text>
+    <text x="803" y="412" text-anchor="middle" font-size="11" fill="#C8E6C9">Recipient</text>
+
+    <!-- BENEFICIARY → System  (upper arrow) -->
+    <line x1="726" y1="376" x2="609" y2="293"
+          stroke="#43A047" stroke-width="2.2" marker-end="url(#z-arr-green)"/>
+    <text x="672" y="358" text-anchor="middle" font-size="9.5" fill="#1B5E20">Application Details,</text>
+    <text x="672" y="370" text-anchor="middle" font-size="9.5" fill="#1B5E20">Income, Urgency, Docs</text>
+
+    <!-- System → BENEFICIARY  (lower arrow) -->
+    <line x1="614" y1="304" x2="726" y2="390"
+          stroke="#43A047" stroke-width="2.2" marker-end="url(#z-arr-green)"/>
+    <text x="700" y="326" text-anchor="middle" font-size="9.5" fill="#1B5E20">Application Status,</text>
+    <text x="700" y="338" text-anchor="middle" font-size="9.5" fill="#1B5E20">Priority Score</text>
+
+    <!-- ── Legend bar ── -->
+    <rect x="14" y="408" width="872" height="52" rx="7"
+          fill="#E8EAF6" stroke="#9FA8DA" stroke-width="1"/>
+    <text x="32" y="428" font-size="11" font-weight="700" fill="#1a237e">Legend:</text>
+    <rect x="90"  y="416" width="20" height="20" rx="3" fill="#EF5350"/>
+    <text x="116" y="430" font-size="10.5" fill="#333">Admin Entity</text>
+    <rect x="200" y="416" width="20" height="20" rx="3" fill="#039BE5"/>
+    <text x="226" y="430" font-size="10.5" fill="#333">Donor Entity</text>
+    <rect x="310" y="416" width="20" height="20" rx="3" fill="#43A047"/>
+    <text x="336" y="430" font-size="10.5" fill="#333">Beneficiary Entity</text>
+    <ellipse cx="460" cy="426" rx="18" ry="11" fill="#F9A825" stroke="#F57F17" stroke-width="1.5"/>
+    <text x="484" y="430" font-size="10.5" fill="#333">Process (Oval)</text>
+    <line x1="565" y1="426" x2="590" y2="426" stroke="#555" stroke-width="2"
+          marker-end="url(#z-arr-red)"/>
+    <text x="596" y="430" font-size="10.5" fill="#333">Data Flow (Arrow)</text>
+
+    <text x="32" y="452" font-size="10" fill="#455a64">
+      Rectangles = external entities (colour-coded). Oval = entire system as one process. Arrows = data flowing in/out.
+    </text>
+  </svg>
+
+  <div class="legend-bar">
+    <div class="legend-item"><div class="swatch" style="background:#EF5350;"></div> Admin (Red)</div>
+    <div class="legend-item"><div class="swatch" style="background:#039BE5;"></div> Donor (Blue)</div>
+    <div class="legend-item"><div class="swatch" style="background:#43A047;"></div> Beneficiary (Green)</div>
+    <div class="legend-item"><div class="swatch-oval" style="background:#F9A825;border:2px solid #F57F17;"></div> Central Process (Gold Oval)</div>
+    <div class="legend-item">↔ Paired arrows = bidirectional data exchange</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LEVEL 1 DFD
+═══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2 class="section-title">Level 1 DFD — Decomposed System</h2>
+  <p class="section-desc">
+    Five processes, four data stores, and three external entities.
+    Repeated entities (marked <strong>★</strong>) avoid long crossing arrows.
+    Dashed lines show JWT token flows; solid lines show data flows.
+  </p>
+
+  <svg width="1160" height="1010" viewBox="0 0 1160 1010" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Arrow markers -->
+      <marker id="l-red"    markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#C62828"/></marker>
+      <marker id="l-blue"   markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#0277BD"/></marker>
+      <marker id="l-green"  markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#2E7D32"/></marker>
+      <marker id="l-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#4527A0"/></marker>
+      <marker id="l-teal"   markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#004D40"/></marker>
+      <marker id="l-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#BF360C"/></marker>
+      <marker id="l-navy"   markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#0D47A1"/></marker>
+      <marker id="l-dark"   markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#333"/></marker>
+
+      <!-- Shadow -->
+      <filter id="l-shadow" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#00000022"/>
+      </filter>
+
+      <!-- Process radial gradients -->
+      <radialGradient id="gP1" cx="50%" cy="38%" r="62%">
+        <stop offset="0%" stop-color="#EDE7F6"/><stop offset="100%" stop-color="#7E57C2"/>
+      </radialGradient>
+      <radialGradient id="gP2" cx="50%" cy="38%" r="62%">
+        <stop offset="0%" stop-color="#E0F2F1"/><stop offset="100%" stop-color="#00897B"/>
+      </radialGradient>
+      <radialGradient id="gP3" cx="50%" cy="38%" r="62%">
+        <stop offset="0%" stop-color="#FFEBEE"/><stop offset="100%" stop-color="#E53935"/>
+      </radialGradient>
+      <radialGradient id="gP4" cx="50%" cy="38%" r="62%">
+        <stop offset="0%" stop-color="#FFF3E0"/><stop offset="100%" stop-color="#FB8C00"/>
+      </radialGradient>
+      <radialGradient id="gP5" cx="50%" cy="38%" r="62%">
+        <stop offset="0%" stop-color="#E3F2FD"/><stop offset="100%" stop-color="#1E88E5"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Canvas background -->
+    <rect width="1160" height="1010" rx="10" fill="#FAFCFF"/>
+
+    <!-- ════════════════════════════
+         ROW 1 – TOP EXTERNAL ENTITIES
+         ════════════════════════════ -->
+
+    <!-- ADMIN (top) — Red -->
+    <rect x="28"  y="20" width="128" height="62" rx="8"
+          fill="#EF5350" stroke="#B71C1C" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="92"  y="47" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">ADMIN</text>
+    <text x="92"  y="65" text-anchor="middle" font-size="10" fill="#FFCDD2">Manager</text>
+
+    <!-- DONOR (top) — Blue -->
+    <rect x="492" y="20" width="132" height="62" rx="8"
+          fill="#039BE5" stroke="#01579B" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="558" y="47" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">DONOR</text>
+    <text x="558" y="65" text-anchor="middle" font-size="10" fill="#B3E5FC">Contributor</text>
+
+    <!-- BENEFICIARY (top) — Green -->
+    <rect x="1002" y="20" width="148" height="62" rx="8"
+          fill="#43A047" stroke="#1B5E20" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="1076" y="47" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">BENEFICIARY</text>
+    <text x="1076" y="65" text-anchor="middle" font-size="10" fill="#C8E6C9">Recipient</text>
+
+
+    <!-- ════════════════════════════
+         P1 – USER AUTHENTICATION  (cy=195)
+         ════════════════════════════ -->
+    <ellipse cx="558" cy="195" rx="142" ry="63"
+             fill="url(#gP1)" stroke="#512DA8" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="558" y="185" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">P1: User Authentication</text>
+    <text x="558" y="202" text-anchor="middle" font-size="10" fill="#D1C4E9">Login / Register / JWT Issuance</text>
+
+    <!-- ADMIN(top) → P1 -->
+    <path d="M 156 44 C 250 44 380 130 416 182"
+          stroke="#EF5350" stroke-width="2" fill="none" marker-end="url(#l-red)"/>
+    <text x="252" y="84" text-anchor="middle" font-size="9" fill="#B71C1C">Login Credentials</text>
+
+    <!-- DONOR(top) → P1 -->
+    <line x1="558" y1="82" x2="558" y2="132"
+          stroke="#039BE5" stroke-width="2" marker-end="url(#l-blue)"/>
+    <text x="590" y="110" font-size="9" fill="#01579B">Credentials</text>
+
+    <!-- BENEFICIARY(top) → P1 -->
+    <path d="M 1002 44 C 900 44 760 130 700 182"
+          stroke="#43A047" stroke-width="2" fill="none" marker-end="url(#l-green)"/>
+    <text x="900" y="84" text-anchor="middle" font-size="9" fill="#2E7D32">Login Credentials</text>
+
+
+    <!-- ════════════════════════════
+         D1 – USERS  (y=318-373)
+         ════════════════════════════ -->
+    <!-- open-rect: left + top + bottom lines, right side open -->
+    <line x1="468" y1="318" x2="468" y2="373" stroke="#512DA8" stroke-width="2"/>
+    <line x1="468" y1="318" x2="685" y2="318" stroke="#512DA8" stroke-width="2"/>
+    <line x1="468" y1="373" x2="685" y2="373" stroke="#512DA8" stroke-width="2"/>
+    <rect x="469" y="319" width="215" height="53" fill="#EDE7F6"/>
+    <text x="576" y="341" text-anchor="middle" font-size="12" font-weight="700" fill="#4527A0">D1: USERS</text>
+    <text x="576" y="358" text-anchor="middle" font-size="9"  fill="#512DA8">id · name · email · password · role</text>
+
+    <!-- P1 → D1 (write) -->
+    <line x1="548" y1="258" x2="548" y2="318"
+          stroke="#7E57C2" stroke-width="1.8" marker-end="url(#l-purple)"/>
+    <text x="516" y="293" text-anchor="end" font-size="9" fill="#4527A0">Store User</text>
+
+    <!-- D1 → P1 (read) -->
+    <line x1="584" y1="318" x2="584" y2="258"
+          stroke="#7E57C2" stroke-width="1.8" marker-end="url(#l-purple)"/>
+    <text x="590" y="293" font-size="9" fill="#4527A0">Validate User</text>
+
+
+    <!-- ════════════════════════════
+         REPEATED ENTITIES (row 4)
+         ════════════════════════════ -->
+
+    <!-- DONOR' (left repeat) -->
+    <rect x="20" y="398" width="120" height="60" rx="8"
+          fill="#0288D1" stroke="#01579B" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <!-- repeat marker: small diagonal in top-right corner -->
+    <polyline points="132,398 140,406" stroke="#01579B" stroke-width="2" fill="none"/>
+    <text x="80" y="423" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">DONOR</text>
+    <text x="80" y="440" text-anchor="middle" font-size="9"  fill="#B3E5FC">★ Repeated</text>
+
+    <!-- BENEFICIARY' (right repeat) -->
+    <rect x="1020" y="398" width="132" height="60" rx="8"
+          fill="#388E3C" stroke="#1B5E20" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <polyline points="1144,398 1152,406" stroke="#1B5E20" stroke-width="2" fill="none"/>
+    <text x="1086" y="422" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">BENEFICIARY</text>
+    <text x="1086" y="439" text-anchor="middle" font-size="9"  fill="#C8E6C9">★ Repeated</text>
+
+
+    <!-- ════════════════════════════
+         P2 – DONATION MGMT  (cx=268, cy=480)
+         ════════════════════════════ -->
+    <ellipse cx="268" cy="480" rx="130" ry="60"
+             fill="url(#gP2)" stroke="#00695C" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="268" y="470" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">P2: Donation</text>
+    <text x="268" y="487" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Management</text>
+    <text x="268" y="503" text-anchor="middle" font-size="9"  fill="#B2DFDB">Accept &amp; Record Donations</text>
+
+    <!-- P1 → P2 (JWT token – dashed) -->
+    <path d="M 416 208 C 330 270 280 380 270 420"
+          stroke="#7B1FA2" stroke-width="1.8" fill="none" stroke-dasharray="6,3"
+          marker-end="url(#l-purple)"/>
+    <text x="317" y="305" text-anchor="middle" font-size="9" fill="#7B1FA2">JWT Token</text>
+    <text x="317" y="317" text-anchor="middle" font-size="9" fill="#7B1FA2">(Donor Role)</text>
+
+    <!-- DONOR' → P2 -->
+    <line x1="140" y1="422" x2="148" y2="466"
+          stroke="#039BE5" stroke-width="1.8" marker-end="url(#l-blue)"/>
+    <text x="96" y="448" text-anchor="middle" font-size="9" fill="#01579B">Donation Amt,</text>
+    <text x="96" y="460" text-anchor="middle" font-size="9" fill="#01579B">Message</text>
+
+    <!-- P2 → DONOR' (confirmation) -->
+    <line x1="143" y1="478" x2="140" y2="448"
+          stroke="#039BE5" stroke-width="1.8" marker-end="url(#l-blue)"/>
+    <text x="56" y="492" text-anchor="middle" font-size="9" fill="#01579B">Confirmation</text>
+
+
+    <!-- ════════════════════════════
+         P3 – APPLICATION MGMT  (cx=890, cy=480)
+         ════════════════════════════ -->
+    <ellipse cx="890" cy="480" rx="130" ry="60"
+             fill="url(#gP3)" stroke="#C62828" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="890" y="470" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">P3: Application</text>
+    <text x="890" y="487" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Management</text>
+    <text x="890" y="503" text-anchor="middle" font-size="9"  fill="#FFCDD2">Submit, Score &amp; Track</text>
+
+    <!-- P1 → P3 (JWT token – dashed) -->
+    <path d="M 700 208 C 790 270 880 380 888 420"
+          stroke="#7B1FA2" stroke-width="1.8" fill="none" stroke-dasharray="6,3"
+          marker-end="url(#l-purple)"/>
+    <text x="848" y="308" text-anchor="middle" font-size="9" fill="#7B1FA2">JWT Token</text>
+    <text x="848" y="320" text-anchor="middle" font-size="9" fill="#7B1FA2">(Beneficiary)</text>
+
+    <!-- BENEFICIARY' → P3 -->
+    <line x1="1020" y1="422" x2="1016" y2="466"
+          stroke="#43A047" stroke-width="1.8" marker-end="url(#l-green)"/>
+    <text x="1058" y="445" text-anchor="middle" font-size="9" fill="#1B5E20">App Form,</text>
+    <text x="1058" y="457" text-anchor="middle" font-size="9" fill="#1B5E20">Documents</text>
+
+    <!-- P3 → BENEFICIARY' (priority score) -->
+    <line x1="1019" y1="476" x2="1020" y2="452"
+          stroke="#43A047" stroke-width="1.8" marker-end="url(#l-green)"/>
+    <text x="1070" y="494" text-anchor="middle" font-size="9" fill="#1B5E20">Priority Score</text>
+
+
+    <!-- ════════════════════════════
+         D2 – DONATIONS  (y=600-652)
+         ════════════════════════════ -->
+    <line x1="100" y1="600" x2="100" y2="652" stroke="#00695C" stroke-width="2"/>
+    <line x1="100" y1="600" x2="430" y2="600" stroke="#00695C" stroke-width="2"/>
+    <line x1="100" y1="652" x2="430" y2="652" stroke="#00695C" stroke-width="2"/>
+    <rect x="101" y="601" width="328" height="50" fill="#E0F7FA"/>
+    <text x="265" y="623" text-anchor="middle" font-size="12" font-weight="700" fill="#004D40">D2: DONATIONS</text>
+    <text x="265" y="640" text-anchor="middle" font-size="9"  fill="#00695C">donor_id · amount · message · created_at</text>
+
+    <!-- P2 → D2 -->
+    <line x1="258" y1="540" x2="258" y2="600"
+          stroke="#00897B" stroke-width="1.8" marker-end="url(#l-teal)"/>
+    <text x="292" y="572" font-size="9" fill="#004D40">Write Donation</text>
+
+
+    <!-- ════════════════════════════
+         D3 – APPLICATIONS  (y=600-652)
+         ════════════════════════════ -->
+    <line x1="680" y1="600" x2="680" y2="652" stroke="#C62828" stroke-width="2"/>
+    <line x1="680" y1="600" x2="1070" y2="600" stroke="#C62828" stroke-width="2"/>
+    <line x1="680" y1="652" x2="1070" y2="652" stroke="#C62828" stroke-width="2"/>
+    <rect x="681" y="601" width="388" height="50" fill="#FFEBEE"/>
+    <text x="875" y="623" text-anchor="middle" font-size="12" font-weight="700" fill="#B71C1C">D3: APPLICATIONS</text>
+    <text x="875" y="640" text-anchor="middle" font-size="9"  fill="#C62828">beneficiary_id · income · urgency · priority_score · status</text>
+
+    <!-- P3 → D3 -->
+    <line x1="882" y1="540" x2="882" y2="600"
+          stroke="#E53935" stroke-width="1.8" marker-end="url(#l-red)"/>
+    <text x="920" y="572" font-size="9" fill="#B71C1C">Write Application</text>
+
+
+    <!-- ════════════════════════════
+         ADMIN' (right repeat)  for P4 approval
+         ════════════════════════════ -->
+    <rect x="1020" y="672" width="128" height="62" rx="8"
+          fill="#EF5350" stroke="#B71C1C" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <polyline points="1140,672 1148,680" stroke="#B71C1C" stroke-width="2" fill="none"/>
+    <text x="1084" y="698" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">ADMIN</text>
+    <text x="1084" y="716" text-anchor="middle" font-size="9"  fill="#FFCDD2">★ Repeated</text>
+
+
+    <!-- ════════════════════════════
+         P4 – FUND ALLOCATION  (cx=875, cy=762)
+         ════════════════════════════ -->
+    <ellipse cx="875" cy="762" rx="132" ry="60"
+             fill="url(#gP4)" stroke="#E65100" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="875" y="752" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">P4: Fund Allocation</text>
+    <text x="875" y="769" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">&amp; Review</text>
+    <text x="875" y="785" text-anchor="middle" font-size="9"  fill="#FFE0B2">Approve / Reject Applications</text>
+
+    <!-- D3 → P4 -->
+    <line x1="875" y1="652" x2="875" y2="702"
+          stroke="#E65100" stroke-width="1.8" marker-end="url(#l-orange)"/>
+    <text x="912" y="680" font-size="9" fill="#BF360C">Pending Apps</text>
+
+    <!-- ADMIN' → P4 (approval decision) -->
+    <line x1="1020" y1="703" x2="1007" y2="748"
+          stroke="#EF5350" stroke-width="1.8" marker-end="url(#l-red)"/>
+    <text x="1035" y="726" font-size="9" fill="#B71C1C">Approval</text>
+    <text x="1035" y="738" font-size="9" fill="#B71C1C">Decision</text>
+
+
+    <!-- ════════════════════════════
+         D4 – TRANSACTIONS  (y=882-934)
+         ════════════════════════════ -->
+    <line x1="670" y1="882" x2="670" y2="934" stroke="#E65100" stroke-width="2"/>
+    <line x1="670" y1="882" x2="1060" y2="882" stroke="#E65100" stroke-width="2"/>
+    <line x1="670" y1="934" x2="1060" y2="934" stroke="#E65100" stroke-width="2"/>
+    <rect x="671" y="883" width="388" height="50" fill="#FFF3E0"/>
+    <text x="865" y="905" text-anchor="middle" font-size="12" font-weight="700" fill="#BF360C">D4: TRANSACTIONS</text>
+    <text x="865" y="922" text-anchor="middle" font-size="9"  fill="#E65100">application_id · amount · type='allocation' · created_at</text>
+
+    <!-- P4 → D4 -->
+    <line x1="875" y1="822" x2="875" y2="882"
+          stroke="#E65100" stroke-width="1.8" marker-end="url(#l-orange)"/>
+    <text x="912" y="855" font-size="9" fill="#BF360C">Write Allocation</text>
+
+
+    <!-- ════════════════════════════
+         P5 – REPORTING &amp; STATISTICS  (cx=340, cy=890)
+         ════════════════════════════ -->
+    <ellipse cx="340" cy="890" rx="148" ry="62"
+             fill="url(#gP5)" stroke="#1565C0" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="340" y="880" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">P5: Reporting &amp;</text>
+    <text x="340" y="897" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Statistics</text>
+    <text x="340" y="913" text-anchor="middle" font-size="9"  fill="#BBDEFB">Aggregates Fund Reports</text>
+
+    <!-- D2 → P5 (donation data) -->
+    <path d="M 265 652 C 265 760 280 820 288 828"
+          stroke="#1565C0" stroke-width="1.8" fill="none" marker-end="url(#l-navy)"/>
+    <text x="228" y="750" text-anchor="middle" font-size="9" fill="#0D47A1">Donation Data</text>
+
+    <!-- D4 → P5 (transaction data) -->
+    <path d="M 670 908 L 488 900"
+          stroke="#1565C0" stroke-width="1.8" fill="none" marker-end="url(#l-navy)"/>
+    <text x="576" y="897" text-anchor="middle" font-size="9" fill="#0D47A1">Transaction Data</text>
+
+
+    <!-- ════════════════════════════
+         ROW 8 – BOTTOM OUTPUT ENTITIES
+         ════════════════════════════ -->
+
+    <!-- ADMIN (bottom) — Red -->
+    <rect x="24"  y="958" width="128" height="50" rx="8"
+          fill="#EF5350" stroke="#B71C1C" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="88"  y="980" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">ADMIN</text>
+    <text x="88"  y="997" text-anchor="middle" font-size="9"  fill="#FFCDD2">Output</text>
+
+    <!-- DONOR (bottom) — Blue -->
+    <rect x="280" y="958" width="128" height="50" rx="8"
+          fill="#039BE5" stroke="#01579B" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="344" y="980" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">DONOR</text>
+    <text x="344" y="997" text-anchor="middle" font-size="9"  fill="#B3E5FC">Output</text>
+
+    <!-- BENEFICIARY (bottom) — Green -->
+    <rect x="540" y="958" width="148" height="50" rx="8"
+          fill="#43A047" stroke="#1B5E20" stroke-width="2.5" filter="url(#l-shadow)"/>
+    <text x="614" y="980" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">BENEFICIARY</text>
+    <text x="614" y="997" text-anchor="middle" font-size="9"  fill="#C8E6C9">Output</text>
+
+    <!-- P5 → ADMIN(bot) -->
+    <path d="M 196 930 C 150 948 130 950 152 958"
+          stroke="#EF5350" stroke-width="1.8" fill="none" marker-end="url(#l-red)"/>
+    <text x="130" y="946" text-anchor="middle" font-size="9" fill="#B71C1C">Full Stats,</text>
+    <text x="130" y="958" text-anchor="middle" font-size="9" fill="#B71C1C">User Mgmt</text>
+
+    <!-- P5 → DONOR(bot) -->
+    <line x1="344" y1="952" x2="344" y2="958"
+          stroke="#039BE5" stroke-width="1.8" marker-end="url(#l-blue)"/>
+    <text x="388" y="950" font-size="9" fill="#01579B">Donation History,</text>
+    <text x="388" y="962" font-size="9" fill="#01579B">Fund Totals</text>
+
+    <!-- P5 → BENEFICIARY(bot) -->
+    <path d="M 484 916 C 540 944 560 952 546 958"
+          stroke="#43A047" stroke-width="1.8" fill="none" marker-end="url(#l-green)"/>
+    <text x="540" y="936" text-anchor="middle" font-size="9" fill="#1B5E20">App Status,</text>
+    <text x="540" y="948" text-anchor="middle" font-size="9" fill="#1B5E20">Priority Score</text>
+
+  </svg>
+
+  <div class="legend-bar">
+    <div class="legend-item"><div class="swatch" style="background:#7E57C2;border-radius:50%;width:14px;height:14px;"></div>P1: User Authentication</div>
+    <div class="legend-item"><div class="swatch" style="background:#00897B;border-radius:50%;width:14px;height:14px;"></div>P2: Donation Management</div>
+    <div class="legend-item"><div class="swatch" style="background:#E53935;border-radius:50%;width:14px;height:14px;"></div>P3: Application Management</div>
+    <div class="legend-item"><div class="swatch" style="background:#FB8C00;border-radius:50%;width:14px;height:14px;"></div>P4: Fund Allocation &amp; Review</div>
+    <div class="legend-item"><div class="swatch" style="background:#1E88E5;border-radius:50%;width:14px;height:14px;"></div>P5: Reporting &amp; Statistics</div>
+    <div class="legend-item"><div class="swatch-ds"></div>Data Store (open rect)</div>
+    <div class="legend-item"><div class="swatch" style="background:#EF5350;"></div>Admin (Red)</div>
+    <div class="legend-item"><div class="swatch" style="background:#039BE5;"></div>Donor (Blue)</div>
+    <div class="legend-item"><div class="swatch" style="background:#43A047;"></div>Beneficiary (Green)</div>
+    <div class="legend-item">- - - JWT token flow &nbsp;|&nbsp; —— Data flow &nbsp;|&nbsp; ★ Repeated entity</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PROCESS + DATA STORE TABLES
+═══════════════════════════════════════════════════════════ -->
+<div class="section" style="overflow-x:auto;">
+  <h2 class="section-title">Process &amp; Data Store Descriptions</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;">
+    <thead>
+      <tr style="background:#3f51b5;color:#fff;">
+        <th style="padding:10px 14px;text-align:left;">ID</th>
+        <th style="padding:10px 14px;text-align:left;">Name</th>
+        <th style="padding:10px 14px;text-align:left;">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#EDE7F6;">
+        <td style="padding:9px 14px;font-weight:700;color:#512DA8;">P1</td>
+        <td style="padding:9px 14px;font-weight:600;">User Authentication</td>
+        <td style="padding:9px 14px;">Validates credentials, registers new users, issues JWT tokens, enforces role-based access (admin / donor / beneficiary).</td>
+      </tr>
+      <tr style="background:#E0F7FA;">
+        <td style="padding:9px 14px;font-weight:700;color:#004D40;">P2</td>
+        <td style="padding:9px 14px;font-weight:600;">Donation Management</td>
+        <td style="padding:9px 14px;">Accepts donation submissions from verified donors, stores records in D2, computes total donated funds.</td>
+      </tr>
+      <tr style="background:#FFEBEE;">
+        <td style="padding:9px 14px;font-weight:700;color="#B71C1C;">P3</td>
+        <td style="padding:9px 14px;font-weight:600;">Application Management</td>
+        <td style="padding:9px 14px;">Validates &amp; stores assistance applications in D3; calculates a server-side priority score (0–100) from income, family size, urgency, and documents.</td>
+      </tr>
+      <tr style="background:#FFF3E0;">
+        <td style="padding:9px 14px;font-weight:700;color:#BF360C;">P4</td>
+        <td style="padding:9px 14px;font-weight:600;">Fund Allocation &amp; Review</td>
+        <td style="padding:9px 14px;">Admin approves or rejects pending applications; approved applications generate allocation records in D4, reducing available balance.</td>
+      </tr>
+      <tr style="background:#E3F2FD;">
+        <td style="padding:9px 14px;font-weight:700;color:#0D47A1;">P5</td>
+        <td style="padding:9px 14px;font-weight:600;">Reporting &amp; Statistics</td>
+        <td style="padding:9px 14px;">Aggregates D2 + D4 to produce role-specific dashboards: Admin sees all stats; Donor sees own donation history; Beneficiary sees application status &amp; score.</td>
+      </tr>
+      <tr style="background:#EDE7F6;">
+        <td style="padding:9px 14px;font-weight:700;color:#512DA8;">D1</td>
+        <td style="padding:9px 14px;font-weight:600;">USERS table</td>
+        <td style="padding:9px 14px;">id · name · email · password_hash · role (admin | donor | beneficiary)</td>
+      </tr>
+      <tr style="background:#E0F7FA;">
+        <td style="padding:9px 14px;font-weight:700;color:#004D40;">D2</td>
+        <td style="padding:9px 14px;font-weight:600;">DONATIONS table</td>
+        <td style="padding:9px 14px;">id · donor_id · amount · message · created_at</td>
+      </tr>
+      <tr style="background:#FFEBEE;">
+        <td style="padding:9px 14px;font-weight:700;color:#B71C1C;">D3</td>
+        <td style="padding:9px 14px;font-weight:600;">APPLICATIONS table</td>
+        <td style="padding:9px 14px;">id · beneficiary_id · income · family_members · urgency · amount · category · reason · priority_score · priority_level · status · documents_path</td>
+      </tr>
+      <tr style="background:#FFF3E0;">
+        <td style="padding:9px 14px;font-weight:700;color:#BF360C;">D4</td>
+        <td style="padding:9px 14px;font-weight:600;">TRANSACTIONS table</td>
+        <td style="padding:9px 14px;">id · application_id · donor_id · amount · type='allocation' · created_at</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
