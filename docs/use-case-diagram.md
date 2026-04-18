@@ -7,6 +7,8 @@
 ```plantuml
 @startuml Financial Resource Management - Use Case Diagram
 
+left to right direction
+
 skinparam actorStyle awesome
 skinparam backgroundColor #FAFAFA
 skinparam usecase {
