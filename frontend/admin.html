@@ -38,6 +38,12 @@
       <a href="#" class="nav-item" data-section="donations" onclick="showSection('donations', this)">
         <span class="nav-icon">💸</span> Donations
       </a>
+      <a href="#" class="nav-item" data-section="reports" onclick="showSection('reports', this)">
+        <span class="nav-icon">📈</span> Reports
+      </a>
+      <a href="#" class="nav-item" data-section="flowchart" onclick="showSection('flowchart', this)">
+        <span class="nav-icon">🔀</span> Priority Flowchart
+      </a>
       <a href="#" class="nav-item" data-section="users" onclick="showSection('users', this)">
         <span class="nav-icon">👥</span> Users
       </a>
@@ -152,6 +158,272 @@
         </div>
         <div id="usersTable">
           <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── REPORTS SECTION ── -->
+    <section class="content-section" id="section-reports">
+      <div class="section-header">
+        <h2>Donation Reports</h2>
+        <p>Comprehensive analytics on donations and fund allocation</p>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="stats-grid" id="reportSummaryGrid">
+        <div class="stat-card">
+          <div class="stat-icon stat-blue">💰</div>
+          <div class="stat-info"><div class="stat-value" id="rep-total-amount">₹0</div><div class="stat-label">Total Donated</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-green">🔢</div>
+          <div class="stat-info"><div class="stat-value" id="rep-total-count">0</div><div class="stat-label">Total Donations</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-purple">📊</div>
+          <div class="stat-info"><div class="stat-value" id="rep-avg">₹0</div><div class="stat-label">Average Donation</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-yellow">👥</div>
+          <div class="stat-info"><div class="stat-value" id="rep-donors">0</div><div class="stat-label">Unique Donors</div></div>
+        </div>
+      </div>
+
+      <!-- 10-day recent donations -->
+      <div class="card mt-2">
+        <div class="card-header">
+          <h3>🕐 Donations in the Last 10 Days</h3>
+          <button class="btn-sm" onclick="loadRecentDonations()">🔄 Refresh</button>
+        </div>
+        <div id="recentDonationsTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+
+      <!-- Period-wise report -->
+      <div class="card mt-2">
+        <div class="card-header">
+          <h3>📅 Period-wise Donations</h3>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <input type="date" id="periodFrom" class="filter-input" />
+            <span style="color:var(--text-muted);font-size:0.85rem">to</span>
+            <input type="date" id="periodTo" class="filter-input" />
+            <button class="btn-sm" onclick="loadPeriodReport()">🔍 Filter</button>
+            <button class="btn-sm" onclick="clearPeriodFilter()">✖ Clear</button>
+          </div>
+        </div>
+        <div id="periodReportTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+
+      <!-- Purpose/Reason-wise report -->
+      <div class="card mt-2">
+        <div class="card-header">
+          <h3>🎯 Reason-wise / Purpose-wise Donations</h3>
+          <button class="btn-sm" onclick="loadPurposeReport()">🔄 Refresh</button>
+        </div>
+        <div id="purposeReportChart"></div>
+      </div>
+
+      <!-- Date-wise report -->
+      <div class="card mt-2">
+        <div class="card-header">
+          <h3>📆 Date-wise Donations (Last 30 Days)</h3>
+          <button class="btn-sm" onclick="loadDateReport()">🔄 Refresh</button>
+        </div>
+        <div id="dateReportTable">
+          <div class="loading-spinner"><div class="spinner-ring"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PRIORITY FLOWCHART SECTION ── -->
+    <section class="content-section" id="section-flowchart">
+      <div class="section-header">
+        <h2>Priority Factor Calculation</h2>
+        <p>Visual flowchart and logic for computing beneficiary application priority scores</p>
+      </div>
+
+      <!-- Score legend -->
+      <div class="stats-grid" style="margin-bottom:1.5rem">
+        <div class="stat-card">
+          <div class="stat-icon stat-blue">💵</div>
+          <div class="stat-info"><div class="stat-value">+30</div><div class="stat-label">Income &lt; ₹10,000 / max</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-green">👨‍👩‍👧</div>
+          <div class="stat-info"><div class="stat-value">+20</div><div class="stat-label">Family &gt; 5 members / max</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-yellow">⚡</div>
+          <div class="stat-info"><div class="stat-value">+30</div><div class="stat-label">Critical urgency / max</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-purple">📄</div>
+          <div class="stat-info"><div class="stat-value">+20</div><div class="stat-label">Documents uploaded / max</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>🔀 Priority Score Flowchart (Max Score: 100)</h3></div>
+        <div style="padding:1.5rem;overflow-x:auto">
+          <!-- SVG Flowchart -->
+          <svg viewBox="0 0 780 900" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:780px;display:block;margin:0 auto;font-family:Poppins,sans-serif">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#667eea"/>
+              </marker>
+            </defs>
+
+            <!-- Start -->
+            <ellipse cx="390" cy="40" rx="110" ry="28" fill="#667eea" stroke="#764ba2" stroke-width="2"/>
+            <text x="390" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">START: New Application</text>
+
+            <!-- Arrow down -->
+            <line x1="390" y1="68" x2="390" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Init score = 0 -->
+            <rect x="270" y="100" width="240" height="44" rx="8" fill="rgba(102,126,234,0.15)" stroke="#667eea" stroke-width="1.5"/>
+            <text x="390" y="127" text-anchor="middle" fill="#fff" font-size="13">Initialize score = 0</text>
+
+            <!-- Arrow -->
+            <line x1="390" y1="144" x2="390" y2="175" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Income diamond -->
+            <polygon points="390,175 520,220 390,265 260,220" fill="rgba(118,75,162,0.25)" stroke="#764ba2" stroke-width="2"/>
+            <text x="390" y="214" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Monthly Income?</text>
+            <text x="390" y="230" text-anchor="middle" fill="#a78bfa" font-size="11">(income factor)</text>
+
+            <!-- Income branches -->
+            <line x1="260" y1="220" x2="80" y2="220" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="165" y="213" text-anchor="middle" fill="#4fe995" font-size="11">&lt; ₹10,000</text>
+            <rect x="20" y="200" width="60" height="40" rx="6" fill="rgba(79,233,149,0.2)" stroke="#4fe995" stroke-width="1.5"/>
+            <text x="50" y="225" text-anchor="middle" fill="#4fe995" font-size="13" font-weight="700">+30</text>
+
+            <line x1="390" y1="265" x2="390" y2="290" stroke="#667eea" stroke-width="1.5"/>
+            <text x="405" y="281" fill="#f093fb" font-size="11">₹10k–19,999</text>
+            <rect x="340" y="290" width="100" height="36" rx="6" fill="rgba(240,147,251,0.2)" stroke="#f093fb" stroke-width="1.5"/>
+            <text x="390" y="313" text-anchor="middle" fill="#f093fb" font-size="13" font-weight="700">+20</text>
+
+            <line x1="520" y1="220" x2="700" y2="220" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="605" y="213" text-anchor="middle" fill="#fbbf24" font-size="11">₹20k–29,999</text>
+            <rect x="700" y="200" width="60" height="40" rx="6" fill="rgba(251,191,36,0.2)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="730" y="225" text-anchor="middle" fill="#fbbf24" font-size="13" font-weight="700">+10</text>
+
+            <!-- converge after income -->
+            <line x1="50" y1="240" x2="50" y2="360" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="326" x2="390" y2="360" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="730" y1="240" x2="730" y2="360" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="50" y1="360" x2="730" y2="360" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="360" x2="390" y2="385" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Family diamond -->
+            <polygon points="390,385 520,430 390,475 260,430" fill="rgba(118,75,162,0.25)" stroke="#764ba2" stroke-width="2"/>
+            <text x="390" y="424" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Family Members?</text>
+            <text x="390" y="440" text-anchor="middle" fill="#a78bfa" font-size="11">(family factor)</text>
+
+            <!-- Family branches -->
+            <line x1="260" y1="430" x2="130" y2="430" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="195" y="423" text-anchor="middle" fill="#4fe995" font-size="11">&gt; 5</text>
+            <rect x="70" y="410" width="60" height="40" rx="6" fill="rgba(79,233,149,0.2)" stroke="#4fe995" stroke-width="1.5"/>
+            <text x="100" y="435" text-anchor="middle" fill="#4fe995" font-size="13" font-weight="700">+20</text>
+
+            <line x1="520" y1="430" x2="640" y2="430" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="580" y="423" text-anchor="middle" fill="#fbbf24" font-size="11">3–5</text>
+            <rect x="640" y="410" width="60" height="40" rx="6" fill="rgba(251,191,36,0.2)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="670" y="435" text-anchor="middle" fill="#fbbf24" font-size="13" font-weight="700">+10</text>
+
+            <line x1="390" y1="475" x2="390" y2="500" stroke="#667eea" stroke-width="1.5"/>
+            <text x="410" y="492" fill="#94a3b8" font-size="11">≤ 3 → +0</text>
+
+            <!-- converge family -->
+            <line x1="100" y1="450" x2="100" y2="520" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="500" x2="390" y2="520" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="670" y1="450" x2="670" y2="520" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="100" y1="520" x2="670" y2="520" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="520" x2="390" y2="545" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Urgency diamond -->
+            <polygon points="390,545 520,590 390,635 260,590" fill="rgba(118,75,162,0.25)" stroke="#764ba2" stroke-width="2"/>
+            <text x="390" y="584" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Urgency Level?</text>
+            <text x="390" y="600" text-anchor="middle" fill="#a78bfa" font-size="11">(urgency factor)</text>
+
+            <!-- Urgency branch labels -->
+            <line x1="260" y1="590" x2="80" y2="590" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="170" y="583" text-anchor="middle" fill="#ef4444" font-size="10">Critical</text>
+            <rect x="20" y="570" width="60" height="40" rx="6" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="1.5"/>
+            <text x="50" y="595" text-anchor="middle" fill="#ef4444" font-size="13" font-weight="700">+30</text>
+
+            <line x1="390" y1="635" x2="390" y2="660" stroke="#667eea" stroke-width="1.5"/>
+            <text x="410" y="652" fill="#f093fb" font-size="10">High → +20</text>
+
+            <line x1="520" y1="590" x2="700" y2="590" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="605" y="583" text-anchor="middle" fill="#fbbf24" font-size="10">Medium/Low</text>
+            <rect x="700" y="570" width="70" height="40" rx="6" fill="rgba(251,191,36,0.2)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="735" y="595" text-anchor="middle" fill="#fbbf24" font-size="13" font-weight="700">+10/+5</text>
+
+            <!-- converge urgency -->
+            <line x1="50" y1="610" x2="50" y2="690" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="660" x2="390" y2="690" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="735" y1="610" x2="735" y2="690" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="50" y1="690" x2="735" y2="690" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="690" x2="390" y2="715" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Documents diamond -->
+            <polygon points="390,715 510,748 390,781 270,748" fill="rgba(118,75,162,0.25)" stroke="#764ba2" stroke-width="2"/>
+            <text x="390" y="742" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Documents Uploaded?</text>
+            <text x="390" y="758" text-anchor="middle" fill="#a78bfa" font-size="11">(document factor)</text>
+
+            <line x1="510" y1="748" x2="630" y2="748" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="568" y="741" text-anchor="middle" fill="#4fe995" font-size="11">Yes</text>
+            <rect x="630" y="728" width="60" height="40" rx="6" fill="rgba(79,233,149,0.2)" stroke="#4fe995" stroke-width="1.5"/>
+            <text x="660" y="753" text-anchor="middle" fill="#4fe995" font-size="13" font-weight="700">+20</text>
+
+            <line x1="270" y1="748" x2="170" y2="748" stroke="#667eea" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="220" y="741" text-anchor="middle" fill="#94a3b8" font-size="11">No → +0</text>
+
+            <!-- converge docs -->
+            <line x1="660" y1="768" x2="660" y2="820" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="781" x2="390" y2="820" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="170" y1="748" x2="170" y2="820" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="170" y1="820" x2="660" y2="820" stroke="#667eea" stroke-width="1.5"/>
+            <line x1="390" y1="820" x2="390" y2="845" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- End -->
+            <ellipse cx="390" cy="870" rx="140" ry="28" fill="linear-gradient(135deg,#667eea,#764ba2)" stroke="#764ba2" stroke-width="2"/>
+            <ellipse cx="390" cy="870" rx="140" ry="28" fill="#667eea" opacity="0.9"/>
+            <text x="390" y="865" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">Final Priority Score (0–100)</text>
+            <text x="390" y="881" text-anchor="middle" fill="#c4b5fd" font-size="11">≥60 = High | 30–59 = Medium | &lt;30 = Low</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Logic table -->
+      <div class="card mt-2">
+        <div class="card-header"><h3>📋 Priority Logic Reference Table</h3></div>
+        <div class="table-wrap" style="padding:0 1rem 1rem">
+          <table>
+            <thead>
+              <tr><th>Factor</th><th>Condition</th><th>Points</th></tr>
+            </thead>
+            <tbody>
+              <tr><td rowspan="4" style="font-weight:600">💵 Income</td><td>Income &lt; ₹10,000/month</td><td style="color:#4fe995;font-weight:700">+30</td></tr>
+              <tr><td>₹10,000 – ₹19,999</td><td style="color:#f093fb;font-weight:700">+20</td></tr>
+              <tr><td>₹20,000 – ₹29,999</td><td style="color:#fbbf24;font-weight:700">+10</td></tr>
+              <tr><td>₹30,000+</td><td style="color:var(--text-muted)">+0</td></tr>
+              <tr><td rowspan="3" style="font-weight:600">👨‍👩‍👧 Family Members</td><td>More than 5</td><td style="color:#4fe995;font-weight:700">+20</td></tr>
+              <tr><td>4 or 5</td><td style="color:#fbbf24;font-weight:700">+10</td></tr>
+              <tr><td>3 or fewer</td><td style="color:var(--text-muted)">+0</td></tr>
+              <tr><td rowspan="4" style="font-weight:600">⚡ Urgency</td><td>Critical</td><td style="color:#ef4444;font-weight:700">+30</td></tr>
+              <tr><td>High</td><td style="color:#f093fb;font-weight:700">+20</td></tr>
+              <tr><td>Medium</td><td style="color:#fbbf24;font-weight:700">+10</td></tr>
+              <tr><td>Low</td><td style="color:var(--text-muted);font-weight:700">+5</td></tr>
+              <tr><td rowspan="2" style="font-weight:600">📄 Documents</td><td>At least 1 document uploaded</td><td style="color:#4fe995;font-weight:700">+20</td></tr>
+              <tr><td>No documents</td><td style="color:var(--text-muted)">+0</td></tr>
+              <tr style="background:rgba(102,126,234,0.1)"><td colspan="2" style="font-weight:700">Maximum Possible Score</td><td style="color:#667eea;font-weight:700;font-size:1.1rem">100</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>

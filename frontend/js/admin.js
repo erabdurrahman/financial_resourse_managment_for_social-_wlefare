@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
   loadApplications();
   loadDonations();
   loadUsers();
+  loadReportSummary();
+  loadRecentDonations();
+  loadPeriodReport();
+  loadPurposeReport();
+  loadDateReport();
 });
 
 function updateClock() {
@@ -46,7 +51,7 @@ function showSection(name, linkEl) {
   document.getElementById(`section-${name}`).classList.add('active');
   if (linkEl) linkEl.classList.add('active');
 
-  const titles = { dashboard: 'Dashboard', applications: 'Applications', donations: 'Donations', users: 'Users' };
+  const titles = { dashboard: 'Dashboard', applications: 'Applications', donations: 'Donations', users: 'Users', reports: 'Reports', flowchart: 'Priority Flowchart' };
   document.getElementById('pageTitle').textContent = titles[name] || name;
   return false;
 }
@@ -206,6 +211,7 @@ async function loadDonations() {
         <td>${escHtml(d.donor_name)}</td>
         <td style="color:var(--text-muted);font-size:0.75rem">${escHtml(d.donor_email)}</td>
         <td style="font-weight:700;color:#4fe995">${formatCurrency(d.amount)}</td>
+        <td><span class="badge badge-purpose">${escHtml(d.purpose || 'General Welfare')}</span></td>
         <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(d.message || '')}">${escHtml(d.message || '—')}</td>
         <td>${formatDate(d.created_at)}</td>
       </tr>`).join('');
@@ -213,7 +219,7 @@ async function loadDonations() {
     container.innerHTML = `
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>Donor</th><th>Email</th><th>Amount</th><th>Message</th><th>Date</th></tr></thead>
+          <thead><tr><th>ID</th><th>Donor</th><th>Email</th><th>Amount</th><th>Purpose</th><th>Message</th><th>Date</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
@@ -297,6 +303,205 @@ async function modalConfirm() {
     loadApplications();
   } catch (err) {
     showToast(`Network error while trying to ${action}`, 'error');
+  }
+}
+
+// ── Report: Summary ────────────────────────────────────────────────────────
+async function loadReportSummary() {
+  try {
+    const res  = await apiFetch('/api/admin/reports/summary');
+    if (!res || !res.ok) return;
+    const data = await res.json();
+    animateNumber('rep-total-amount', data.total_amount, true);
+    animateNumber('rep-total-count',  data.total_donations, false);
+    animateNumber('rep-avg',          data.average_donation, true);
+    animateNumber('rep-donors',       data.total_donors, false);
+  } catch (_) {}
+}
+
+// ── Report: Recent 10-day donations ────────────────────────────────────────
+async function loadRecentDonations() {
+  const container = document.getElementById('recentDonationsTable');
+  if (!container) return;
+  try {
+    const res  = await apiFetch('/api/admin/reports/recent');
+    if (!res) return;
+    const data = await res.json();
+
+    if (!data.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No donations in the last 10 days.</p></div>`;
+      return;
+    }
+
+    const rows = data.map(d => `
+      <tr>
+        <td>#${d.id}</td>
+        <td>${escHtml(d.donor_name)}</td>
+        <td style="color:var(--text-muted);font-size:0.75rem">${escHtml(d.donor_email)}</td>
+        <td style="font-weight:700;color:#4fe995">${formatCurrency(d.amount)}</td>
+        <td><span class="badge badge-purpose">${escHtml(d.purpose || 'General Welfare')}</span></td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(d.message || '')}">${escHtml(d.message || '—')}</td>
+        <td>${formatDate(d.created_at)}</td>
+      </tr>`).join('');
+
+    container.innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Donor</th><th>Email</th><th>Amount</th><th>Purpose</th><th>Message</th><th>Date</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  } catch (_) {
+    container.innerHTML = `<div class="empty-state"><p>Failed to load recent donations.</p></div>`;
+  }
+}
+
+// ── Report: Period-wise ─────────────────────────────────────────────────────
+async function loadPeriodReport() {
+  const container = document.getElementById('periodReportTable');
+  if (!container) return;
+  container.innerHTML = `<div class="loading-spinner"><div class="spinner-ring"></div></div>`;
+
+  const from = document.getElementById('periodFrom') ? document.getElementById('periodFrom').value : '';
+  const to   = document.getElementById('periodTo')   ? document.getElementById('periodTo').value   : '';
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (to)   params.set('to', to);
+
+  try {
+    const res  = await apiFetch(`/api/admin/reports/period?${params}`);
+    if (!res) return;
+    const data = await res.json();
+
+    if (!data.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><p>No data for the selected period.</p></div>`;
+      return;
+    }
+
+    const grandTotal = data.reduce((s, r) => s + parseFloat(r.total_amount), 0);
+    const rows = data.map(r => `
+      <tr>
+        <td style="font-weight:600">${escHtml(r.period)}</td>
+        <td>${r.donation_count}</td>
+        <td style="font-weight:700;color:#4fe995">${formatCurrency(r.total_amount)}</td>
+        <td>
+          <div style="background:rgba(255,255,255,0.08);border-radius:4px;height:10px;width:100%;overflow:hidden">
+            <div style="height:10px;background:linear-gradient(90deg,#667eea,#764ba2);width:${grandTotal > 0 ? Math.round(parseFloat(r.total_amount)/grandTotal*100) : 0}%;border-radius:4px"></div>
+          </div>
+          <span style="font-size:0.75rem;color:var(--text-muted)">${grandTotal > 0 ? Math.round(parseFloat(r.total_amount)/grandTotal*100) : 0}%</span>
+        </td>
+      </tr>`).join('');
+
+    container.innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Month</th><th>Donations</th><th>Total Amount</th><th>Share</th></tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr style="background:rgba(102,126,234,0.1)"><td style="font-weight:700">Grand Total</td><td style="font-weight:700">${data.reduce((s,r)=>s+parseInt(r.donation_count),0)}</td><td style="font-weight:700;color:#4fe995">${formatCurrency(grandTotal)}</td><td></td></tr></tfoot>
+        </table>
+      </div>`;
+  } catch (_) {
+    container.innerHTML = `<div class="empty-state"><p>Failed to load period report.</p></div>`;
+  }
+}
+
+function clearPeriodFilter() {
+  const f = document.getElementById('periodFrom');
+  const t = document.getElementById('periodTo');
+  if (f) f.value = '';
+  if (t) t.value = '';
+  loadPeriodReport();
+}
+
+// ── Report: Purpose/Reason-wise ─────────────────────────────────────────────
+async function loadPurposeReport() {
+  const container = document.getElementById('purposeReportChart');
+  if (!container) return;
+  container.innerHTML = `<div class="loading-spinner"><div class="spinner-ring"></div></div>`;
+
+  try {
+    const res  = await apiFetch('/api/admin/reports/purpose');
+    if (!res) return;
+    const data = await res.json();
+
+    if (!data.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><p>No purpose data available.</p></div>`;
+      return;
+    }
+
+    const grandTotal = data.reduce((s, r) => s + parseFloat(r.total_amount), 0);
+    const purposeColors = {
+      'General Welfare':  '#667eea',
+      'Medical Aid':      '#ef4444',
+      'Education':        '#4fe995',
+      'Emergency Relief': '#f97316',
+      'Food & Nutrition': '#fbbf24',
+      'Shelter':          '#a78bfa',
+      'Other':            '#94a3b8'
+    };
+
+    const bars = data.map(r => {
+      const pct = grandTotal > 0 ? Math.round(parseFloat(r.total_amount) / grandTotal * 100) : 0;
+      const color = purposeColors[r.purpose] || '#667eea';
+      return `
+        <div style="margin-bottom:1rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem">
+            <span style="font-weight:600;color:#fff">${escHtml(r.purpose)}</span>
+            <span style="color:${color};font-weight:700">${formatCurrency(r.total_amount)} &nbsp;(${r.donation_count} donations, ${pct}%)</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:20px;width:100%;overflow:hidden">
+            <div style="height:20px;background:${color};width:${pct}%;border-radius:6px;transition:width 0.6s ease"></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    container.innerHTML = `<div style="padding:1rem 1.5rem">${bars}</div>`;
+  } catch (_) {
+    container.innerHTML = `<div class="empty-state"><p>Failed to load purpose report.</p></div>`;
+  }
+}
+
+// ── Report: Date-wise ───────────────────────────────────────────────────────
+async function loadDateReport() {
+  const container = document.getElementById('dateReportTable');
+  if (!container) return;
+  container.innerHTML = `<div class="loading-spinner"><div class="spinner-ring"></div></div>`;
+
+  try {
+    const res  = await apiFetch('/api/admin/reports/date');
+    if (!res) return;
+    const data = await res.json();
+
+    if (!data.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📆</div><p>No donations in the last 30 days.</p></div>`;
+      return;
+    }
+
+    const maxAmount = Math.max(...data.map(r => parseFloat(r.total_amount)));
+    const rows = data.map(r => {
+      const pct = maxAmount > 0 ? Math.round(parseFloat(r.total_amount) / maxAmount * 100) : 0;
+      return `
+        <tr>
+          <td style="font-weight:600">${new Date(r.date).toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' })}</td>
+          <td>${r.donation_count}</td>
+          <td style="font-weight:700;color:#4fe995">${formatCurrency(r.total_amount)}</td>
+          <td style="min-width:120px">
+            <div style="background:rgba(255,255,255,0.08);border-radius:4px;height:10px;width:100%;overflow:hidden">
+              <div style="height:10px;background:linear-gradient(90deg,#4fe995,#4facfe);width:${pct}%;border-radius:4px"></div>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Donations</th><th>Total Amount</th><th>Relative Amount</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  } catch (_) {
+    container.innerHTML = `<div class="empty-state"><p>Failed to load date report.</p></div>`;
   }
 }
 

@@ -209,11 +209,152 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+/**
+ * getRecentDonations - returns all donations made in the last 10 days
+ */
+const getRecentDonations = async (req, res) => {
+  try {
+    const [donations] = await db.query(
+      `SELECT d.*, u.name AS donor_name, u.email AS donor_email
+       FROM donations d
+       JOIN users u ON d.donor_id = u.id
+       WHERE d.created_at >= DATE_SUB(NOW(), INTERVAL 10 DAY)
+       ORDER BY d.created_at DESC`
+    );
+    res.json(donations);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+/**
+ * getReportPeriod - returns donation totals grouped by month for a given date range
+ * Query params: from (YYYY-MM-DD), to (YYYY-MM-DD)
+ */
+const getReportPeriod = async (req, res) => {
+  try {
+    const { from, to } = req.query;
+    let where = '';
+    const params = [];
+    if (from) { where += ' AND d.created_at >= ?'; params.push(from); }
+    if (to)   { where += ' AND d.created_at <= DATE_ADD(?, INTERVAL 1 DAY)'; params.push(to); }
+
+    const [rows] = await db.query(
+      `SELECT DATE_FORMAT(d.created_at, '%Y-%m') AS period,
+              COUNT(*) AS donation_count,
+              COALESCE(SUM(d.amount), 0) AS total_amount
+       FROM donations d
+       WHERE 1=1 ${where}
+       GROUP BY period
+       ORDER BY period ASC`,
+      params
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+/**
+ * getReportByPurpose - returns donation totals grouped by purpose (reason)
+ */
+const getReportByPurpose = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT purpose,
+              COUNT(*) AS donation_count,
+              COALESCE(SUM(amount), 0) AS total_amount
+       FROM donations
+       GROUP BY purpose
+       ORDER BY total_amount DESC`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+/**
+ * getReportByDate - returns daily donation totals for the last 30 days (or custom range)
+ * Query params: from (YYYY-MM-DD), to (YYYY-MM-DD)
+ */
+const getReportByDate = async (req, res) => {
+  try {
+    const { from, to } = req.query;
+    let where = 'd.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
+    const params = [];
+    if (from && to) {
+      where = 'd.created_at >= ? AND d.created_at <= DATE_ADD(?, INTERVAL 1 DAY)';
+      params.push(from, to);
+    } else if (from) {
+      where = 'd.created_at >= ?';
+      params.push(from);
+    }
+
+    const [rows] = await db.query(
+      `SELECT DATE(d.created_at) AS date,
+              COUNT(*) AS donation_count,
+              COALESCE(SUM(d.amount), 0) AS total_amount
+       FROM donations d
+       WHERE ${where}
+       GROUP BY DATE(d.created_at)
+       ORDER BY date ASC`,
+      params
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+/**
+ * getReportSummary - returns an overall donation and allocation summary
+ */
+const getReportSummary = async (req, res) => {
+  try {
+    const [[totals]] = await db.query(
+      `SELECT COUNT(*) AS total_donations,
+              COALESCE(SUM(amount), 0) AS total_amount,
+              COALESCE(MAX(amount), 0) AS largest_donation,
+              COALESCE(MIN(amount), 0) AS smallest_donation,
+              COALESCE(AVG(amount), 0) AS average_donation
+       FROM donations`
+    );
+    const [[{ total_allocated }]] = await db.query(
+      "SELECT COALESCE(SUM(amount), 0) AS total_allocated FROM transactions WHERE type = 'allocation'"
+    );
+    const [[{ total_approved }]] = await db.query(
+      "SELECT COUNT(*) AS total_approved FROM applications WHERE status = 'approved'"
+    );
+    const [[{ total_donors }]] = await db.query(
+      "SELECT COUNT(DISTINCT donor_id) AS total_donors FROM donations"
+    );
+    res.json({
+      total_donations:   parseInt(totals.total_donations),
+      total_amount:      parseFloat(totals.total_amount),
+      largest_donation:  parseFloat(totals.largest_donation),
+      smallest_donation: parseFloat(totals.smallest_donation),
+      average_donation:  parseFloat(totals.average_donation),
+      total_allocated:   parseFloat(total_allocated),
+      available_funds:   parseFloat(totals.total_amount) - parseFloat(total_allocated),
+      total_approved:    parseInt(total_approved),
+      total_donors:      parseInt(total_donors)
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 module.exports = {
   getAllApplications,
   approveApplication,
   rejectApplication,
   getDashboardStats,
   getAllDonations,
-  getAllUsers
+  getAllUsers,
+  getRecentDonations,
+  getReportPeriod,
+  getReportByPurpose,
+  getReportByDate,
+  getReportSummary
 };

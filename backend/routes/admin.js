@@ -7,7 +7,12 @@ const {
   rejectApplication,
   getDashboardStats,
   getAllDonations,
-  getAllUsers
+  getAllUsers,
+  getRecentDonations,
+  getReportPeriod,
+  getReportByPurpose,
+  getReportByDate,
+  getReportSummary
 } = require('../controllers/adminController');
 const { authenticate, authorize } = require('../middleware/auth');
 
@@ -20,5 +25,12 @@ router.put('/applications/:id/reject',     rejectApplication);
 router.get('/stats',                       getDashboardStats);
 router.get('/donations',                   getAllDonations);
 router.get('/users',                       getAllUsers);
+
+// Report endpoints
+router.get('/reports/recent',              getRecentDonations);
+router.get('/reports/period',              getReportPeriod);
+router.get('/reports/purpose',             getReportByPurpose);
+router.get('/reports/date',                getReportByDate);
+router.get('/reports/summary',             getReportSummary);
 
 module.exports = router;

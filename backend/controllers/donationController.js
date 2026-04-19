@@ -1,21 +1,28 @@
 // Donation Controller - handles donor fund contributions
 const db = require('../config/db');
 
+const VALID_PURPOSES = [
+  'General Welfare', 'Medical Aid', 'Education',
+  'Emergency Relief', 'Food & Nutrition', 'Shelter', 'Other'
+];
+
 /**
  * addDonation - records a new donation from the authenticated donor
- * Body: { amount, message? }
+ * Body: { amount, purpose?, message? }
  */
 const addDonation = async (req, res) => {
   try {
-    const { amount, message } = req.body;
+    const { amount, purpose, message } = req.body;
 
     if (!amount || parseFloat(amount) <= 0) {
       return res.status(400).json({ message: 'Valid donation amount is required' });
     }
 
+    const resolvedPurpose = purpose && VALID_PURPOSES.includes(purpose) ? purpose : 'General Welfare';
+
     const [result] = await db.query(
-      'INSERT INTO donations (donor_id, amount, message) VALUES (?, ?, ?)',
-      [req.user.id, parseFloat(amount), message || '']
+      'INSERT INTO donations (donor_id, amount, purpose, message) VALUES (?, ?, ?, ?)',
+      [req.user.id, parseFloat(amount), resolvedPurpose, message || '']
     );
 
     res.status(201).json({

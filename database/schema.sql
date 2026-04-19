@@ -20,6 +20,7 @@ CREATE TABLE donations (
   id INT AUTO_INCREMENT PRIMARY KEY,
   donor_id INT NOT NULL,
   amount DECIMAL(10, 2) NOT NULL,
+  purpose ENUM('General Welfare','Medical Aid','Education','Emergency Relief','Food & Nutrition','Shelter','Other') NOT NULL DEFAULT 'General Welfare',
   message TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (donor_id) REFERENCES users(id)
@@ -84,10 +85,10 @@ INSERT INTO users (name, email, password, role) VALUES
   ('Carlos Beneficiary','carlos@beneficiary.com','$2a$10$YwJCsrwPRlqnBJbkFpI.ZO5pJO7X8P.e0lJxzAlZMqJlvTJGd7H2.', 'beneficiary');
 
 -- Sample donations
-INSERT INTO donations (donor_id, amount, message) VALUES
-  (2, 5000.00, 'Happy to support those in need. Keep up the great work!'),
-  (3, 3000.00, 'Small contribution, hope it helps someone today.'),
-  (2, 2000.00, 'Monthly recurring donation for the welfare fund.');
+INSERT INTO donations (donor_id, amount, purpose, message) VALUES
+  (2, 5000.00, 'Medical Aid', 'Happy to support those in need. Keep up the great work!'),
+  (3, 3000.00, 'Education', 'Small contribution, hope it helps someone today.'),
+  (2, 2000.00, 'General Welfare', 'Monthly recurring donation for the welfare fund.');
 
 -- Sample applications using new schema
 -- Application 1: Maria - Critical urgency, low income, large family -> score 30+20+30+20=100 -> High

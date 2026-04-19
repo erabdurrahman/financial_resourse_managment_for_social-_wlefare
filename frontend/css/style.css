@@ -379,6 +379,22 @@ tbody tr:last-child td { border-bottom: none; }
 .badge-donor    { background: rgba(79,172,254,0.2);  color: #4facfe; border: 1px solid rgba(79,172,254,0.4); }
 .badge-admin    { background: rgba(164,122,255,0.2); color: #a47aff; border: 1px solid rgba(164,122,255,0.4); }
 .badge-beneficiary { background: rgba(240,147,251,0.2); color: #f093fb; border: 1px solid rgba(240,147,251,0.4); }
+.badge-purpose  { background: rgba(102,126,234,0.2); color: #a78bfa; border: 1px solid rgba(102,126,234,0.4); }
+
+/* ── Date filter input ───────────────────────────────────────────────────── */
+.filter-input {
+  padding: 0.35rem 0.75rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.filter-input:focus { border-color: var(--primary); }
+.filter-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
 /* ── Priority score colors ───────────────────────────────────────────────── */
 .priority-high   { color: #4fe995; font-weight: 700; }

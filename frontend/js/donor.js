@@ -104,6 +104,7 @@ function renderDonationTable(container, donations) {
     <tr>
       <td>#${d.id}</td>
       <td style="font-weight:700;color:#4fe995">${formatCurrency(d.amount)}</td>
+      <td><span class="badge badge-purpose">${escHtml(d.purpose || 'General Welfare')}</span></td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(d.message || '')}">${escHtml(d.message || '—')}</td>
       <td>${formatDate(d.created_at)}</td>
     </tr>`).join('');
@@ -111,7 +112,7 @@ function renderDonationTable(container, donations) {
   container.innerHTML = `
     <div class="table-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Amount</th><th>Message</th><th>Date</th></tr></thead>
+        <thead><tr><th>ID</th><th>Amount</th><th>Purpose</th><th>Message</th><th>Date</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
@@ -122,6 +123,7 @@ async function handleDonate(e) {
   e.preventDefault();
 
   const amount  = document.getElementById('donationAmount').value;
+  const purpose = document.getElementById('donationPurpose').value;
   const message = document.getElementById('donationMessage').value.trim();
   const btn     = document.getElementById('donateBtn');
 
@@ -135,7 +137,7 @@ async function handleDonate(e) {
   try {
     const res  = await apiFetch('/api/donations', {
       method: 'POST',
-      body: JSON.stringify({ amount: parseFloat(amount), message })
+      body: JSON.stringify({ amount: parseFloat(amount), purpose, message })
     });
     if (!res) return;
 
