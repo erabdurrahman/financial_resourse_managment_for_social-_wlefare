@@ -210,6 +210,29 @@ const getAllUsers = async (req, res) => {
 };
 
 /**
+ * buildDateRangeClause - shared helper for building a WHERE date-range clause
+ * Returns { where: string, params: Array }
+ * defaultDays: if neither from nor to provided, defaults to last N days
+ */
+function buildDateRangeClause(from, to, defaultDays = 30) {
+  const params = [];
+  let where;
+  if (from && to) {
+    where = 'd.created_at >= ? AND d.created_at <= DATE_ADD(?, INTERVAL 1 DAY)';
+    params.push(from, to);
+  } else if (from) {
+    where = 'd.created_at >= ?';
+    params.push(from);
+  } else if (to) {
+    where = `d.created_at >= DATE_SUB(NOW(), INTERVAL ${defaultDays} DAY) AND d.created_at <= DATE_ADD(?, INTERVAL 1 DAY)`;
+    params.push(to);
+  } else {
+    where = `d.created_at >= DATE_SUB(NOW(), INTERVAL ${defaultDays} DAY)`;
+  }
+  return { where, params };
+}
+
+/**
  * getRecentDonations - returns all donations made in the last 10 days
  */
 const getRecentDonations = async (req, res) => {
@@ -234,17 +257,14 @@ const getRecentDonations = async (req, res) => {
 const getReportPeriod = async (req, res) => {
   try {
     const { from, to } = req.query;
-    let where = '';
-    const params = [];
-    if (from) { where += ' AND d.created_at >= ?'; params.push(from); }
-    if (to)   { where += ' AND d.created_at <= DATE_ADD(?, INTERVAL 1 DAY)'; params.push(to); }
+    const { where, params } = buildDateRangeClause(from, to, 365);
 
     const [rows] = await db.query(
       `SELECT DATE_FORMAT(d.created_at, '%Y-%m') AS period,
               COUNT(*) AS donation_count,
               COALESCE(SUM(d.amount), 0) AS total_amount
        FROM donations d
-       WHERE 1=1 ${where}
+       WHERE ${where}
        GROUP BY period
        ORDER BY period ASC`,
       params
@@ -281,15 +301,7 @@ const getReportByPurpose = async (req, res) => {
 const getReportByDate = async (req, res) => {
   try {
     const { from, to } = req.query;
-    let where = 'd.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
-    const params = [];
-    if (from && to) {
-      where = 'd.created_at >= ? AND d.created_at <= DATE_ADD(?, INTERVAL 1 DAY)';
-      params.push(from, to);
-    } else if (from) {
-      where = 'd.created_at >= ?';
-      params.push(from);
-    }
+    const { where, params } = buildDateRangeClause(from, to, 30);
 
     const [rows] = await db.query(
       `SELECT DATE(d.created_at) AS date,
