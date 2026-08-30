@@ -1,33 +1,20 @@
-// init.js – Seeds the financial_welfare database with initial data.
-// Run once with:  node backend/init.js  (from the project root)
-//           or:  npm run init           (from the backend/ directory)
-//
-// What this script does:
-//   1. Creates the `financial_welfare` database if it does not exist.
-//   2. Creates all required tables (users, donations, applications, transactions).
-//   3. Inserts one admin account.
-//   4. Inserts two demo donor accounts with sample donations.
-//   5. Inserts two demo beneficiary accounts with sample applications.
-//
-// Credentials created:
-//   Admin       – admin@welfare.org   / admin123
-//   Donor 1     – john@donor.com      / donor123
-//   Donor 2     – sarah@donor.com     / donor123
-//   Beneficiary 1 – maria@beneficiary.com  / benef123
-//   Beneficiary 2 – carlos@beneficiary.com / benef123
-
+// init.js – Seeds the database with initial schema and demo data.
 'use strict';
 
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+const isLocalhost =
+  !process.env.DB_HOST ||
+  process.env.DB_HOST === 'localhost' ||
+  process.env.DB_HOST === '127.0.0.1';
+
 const DB_HOST     = process.env.DB_HOST     || 'localhost';
+const DB_PORT     = Number(process.env.DB_PORT) || 3306;
 const DB_USER     = process.env.DB_USER     || 'root';
 const DB_PASSWORD = process.env.DB_PASSWORD || '';
 const DB_NAME     = process.env.DB_NAME     || 'financial_welfare';
-
-// ─── DDL ─────────────────────────────────────────────────────────────────────
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS users (
@@ -85,16 +72,9 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 `;
 
-// ─── Seed helpers ─────────────────────────────────────────────────────────────
-
-/**
- * Insert a user only if that email is not already present.
- * Returns the user's id (existing or newly inserted).
- */
 async function upsertUser(conn, { name, email, password, role }) {
   const [rows] = await conn.query('SELECT id FROM users WHERE email = ?', [email]);
   if (rows.length > 0) {
-    console.log(`  ↩  User already exists: ${email}`);
     return rows[0].id;
   }
   const hash = await bcrypt.hash(password, 10);
@@ -106,38 +86,24 @@ async function upsertUser(conn, { name, email, password, role }) {
   return result.insertId;
 }
 
-/**
- * Insert a donation row unconditionally (demo data is always useful to have).
- * Skips insertion if a matching row already exists (idempotent re-runs).
- */
 async function insertDonationIfMissing(conn, { donorId, amount, message }) {
   const [rows] = await conn.query(
     'SELECT id FROM donations WHERE donor_id = ? AND amount = ? AND message = ?',
     [donorId, amount, message]
   );
-  if (rows.length > 0) {
-    console.log(`  ↩  Donation already exists for donor_id=${donorId}, amount=${amount}`);
-    return;
-  }
+  if (rows.length > 0) return;
   await conn.query(
     'INSERT INTO donations (donor_id, amount, message) VALUES (?, ?, ?)',
     [donorId, amount, message]
   );
-  console.log(`  ✔  Inserted donation: donor_id=${donorId}, amount=${amount}`);
 }
 
-/**
- * Insert an application row only if an identical one does not yet exist.
- */
 async function insertApplicationIfMissing(conn, app) {
   const [rows] = await conn.query(
     'SELECT id FROM applications WHERE beneficiary_id = ? AND category = ? AND reason = ?',
     [app.beneficiaryId, app.category, app.reason]
   );
-  if (rows.length > 0) {
-    console.log(`  ↩  Application already exists for beneficiary_id=${app.beneficiaryId}, category=${app.category}`);
-    return;
-  }
+  if (rows.length > 0) return;
   await conn.query(
     `INSERT INTO applications
        (beneficiary_id, phone, address, income, family_members, employment_status,
@@ -150,34 +116,44 @@ async function insertApplicationIfMissing(conn, app) {
       app.documentsPath, app.priorityScore, app.priorityLevel, app.status,
     ]
   );
-  console.log(`  ✔  Inserted application: beneficiary_id=${app.beneficiaryId}, category=${app.category}`);
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+async function initDatabase() {
+  console.log('\n🚀  Initialising Financial Welfare database tables & seed data …');
 
-async function main() {
-  console.log('\n🚀  Starting database initialisation …\n');
-
-  // Connect without selecting a database so we can CREATE it if needed.
-  const conn = await mysql.createConnection({
+  const connectionConfig = {
     host:     DB_HOST,
+    port:     DB_PORT,
     user:     DB_USER,
     password: DB_PASSWORD,
+    database: DB_NAME,
     multipleStatements: true,
-  });
+    ...(isLocalhost ? {} : { ssl: { rejectUnauthorized: false } }),
+  };
 
-  // 1. Create database
-  await conn.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
-  console.log(`✅  Database \`${DB_NAME}\` ready.`);
+  // If local, check creating DB first
+  if (isLocalhost) {
+    try {
+      const rootConn = await mysql.createConnection({
+        host: DB_HOST,
+        port: DB_PORT,
+        user: DB_USER,
+        password: DB_PASSWORD,
+      });
+      await rootConn.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
+      await rootConn.end();
+    } catch (e) {
+      console.warn('Local DB check notice:', e.message);
+    }
+  }
 
-  await conn.query(`USE \`${DB_NAME}\``);
+  const conn = await mysql.createConnection(connectionConfig);
 
-  // 2. Create tables
+  // Create tables
   await conn.query(DDL);
-  console.log('✅  Tables created / verified.\n');
+  console.log('✅  Tables created / verified.');
 
-  // 3. Seed admin
-  console.log('👤  Seeding admin user …');
+  // Seed demo admin
   await upsertUser(conn, {
     name:     'Admin User',
     email:    'admin@welfare.org',
@@ -185,8 +161,7 @@ async function main() {
     role:     'admin',
   });
 
-  // 4. Seed donors
-  console.log('\n💳  Seeding donor users …');
+  // Seed donors
   const johnId = await upsertUser(conn, {
     name:     'John Donor',
     email:    'john@donor.com',
@@ -200,8 +175,7 @@ async function main() {
     role:     'donor',
   });
 
-  // 5. Seed donations
-  console.log('\n💰  Seeding sample donations …');
+  // Seed donations
   await insertDonationIfMissing(conn, {
     donorId: johnId,
     amount:  5000.00,
@@ -212,14 +186,8 @@ async function main() {
     amount:  3000.00,
     message: 'Small contribution, hope it helps someone today.',
   });
-  await insertDonationIfMissing(conn, {
-    donorId: johnId,
-    amount:  2000.00,
-    message: 'Monthly recurring donation for the welfare fund.',
-  });
 
-  // 6. Seed beneficiaries
-  console.log('\n🤝  Seeding beneficiary users …');
+  // Seed beneficiaries
   const mariaId = await upsertUser(conn, {
     name:     'Maria Beneficiary',
     email:    'maria@beneficiary.com',
@@ -233,15 +201,7 @@ async function main() {
     role:     'beneficiary',
   });
 
-  // 7. Seed applications
-  // Priority score formula (max 100):
-  //   income < 10000 → +30 | < 20000 → +20 | < 30000 → +10
-  //   family_members > 5 → +20 | > 3 → +10
-  //   urgency: Critical → +30 | High → +20 | Medium → +10 | Low → +5
-  //   documents present → +20
-  console.log('\n📄  Seeding sample applications …');
-
-  // Maria – Critical, low income, large family → score 100 → High
+  // Seed applications
   await insertApplicationIfMissing(conn, {
     beneficiaryId:    mariaId,
     phone:            '555-1001',
@@ -259,7 +219,6 @@ async function main() {
     status:           'pending',
   });
 
-  // Carlos – High urgency, medium-low income, family of 3 → score 70 → High
   await insertApplicationIfMissing(conn, {
     beneficiaryId:    carlosId,
     phone:            '555-2002',
@@ -277,58 +236,15 @@ async function main() {
     status:           'pending',
   });
 
-  // Maria – Medium urgency, medium income, family of 2 → score 20 → Low
-  await insertApplicationIfMissing(conn, {
-    beneficiaryId:    mariaId,
-    phone:            '555-1001',
-    address:          '12 Oak Street, Springfield',
-    income:           25000.00,
-    familyMembers:    2,
-    employmentStatus: 'Part-time',
-    amount:           400.00,
-    category:         'Education',
-    reason:           'Need school supplies and uniforms for 2 children. Cannot afford basic education materials this semester.',
-    urgency:          'Medium',
-    documentsPath:    null,
-    priorityScore:    20,
-    priorityLevel:    'Low',
-    status:           'pending',
-  });
-
-  // Carlos – Low urgency, higher income, small family → score 5 → Low
-  await insertApplicationIfMissing(conn, {
-    beneficiaryId:    carlosId,
-    phone:            '555-2002',
-    address:          '45 Maple Ave, Riverside',
-    income:           35000.00,
-    familyMembers:    2,
-    employmentStatus: 'Employed',
-    amount:           600.00,
-    category:         'Education',
-    reason:           'Want to enroll in a 6-month coding bootcamp to improve employment prospects and become self-sufficient.',
-    urgency:          'Low',
-    documentsPath:    null,
-    priorityScore:    5,
-    priorityLevel:    'Low',
-    status:           'pending',
-  });
-
   await conn.end();
-
-  console.log('\n✅  Initialisation complete!\n');
-  console.log('   Demo credentials:');
-  console.log('   ┌─────────────────────────────────┬──────────────┬─────────────┐');
-  console.log('   │ Email                           │ Password     │ Role        │');
-  console.log('   ├─────────────────────────────────┼──────────────┼─────────────┤');
-  console.log('   │ admin@welfare.org               │ admin123     │ admin       │');
-  console.log('   │ john@donor.com                  │ donor123     │ donor       │');
-  console.log('   │ sarah@donor.com                 │ donor123     │ donor       │');
-  console.log('   │ maria@beneficiary.com           │ benef123     │ beneficiary │');
-  console.log('   │ carlos@beneficiary.com          │ benef123     │ beneficiary │');
-  console.log('   └─────────────────────────────────┴──────────────┴─────────────┘\n');
+  console.log('✅  Database Initialisation complete!\n');
 }
 
-main().catch(err => {
-  console.error('\n❌  Initialisation failed:', err.message);
-  process.exit(1);
-});
+if (require.main === module) {
+  initDatabase().catch((err) => {
+    console.error('❌  Initialisation failed:', err.message);
+    process.exit(1);
+  });
+}
+
+module.exports = { initDatabase };

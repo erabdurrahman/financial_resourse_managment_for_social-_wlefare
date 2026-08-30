@@ -110,23 +110,20 @@ app.use((err, req, res, next) => {
 // ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 const db = require('./config/db');
+const { initDatabase } = require('./init');
 
 app.listen(PORT, async () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`   Frontend: http://localhost:${PORT}`);
   console.log(`   API:      http://localhost:${PORT}/api`);
 
-  // Verify database connection on startup so misconfiguration is caught early
+  // Verify database connection and initialize tables
   try {
-    await db.query('SELECT 1');
-    console.log('✅ Database connection OK');
+    await initDatabase();
+    console.log('✅ Database connected and verified.');
   } catch (err) {
-    console.error('❌ Database connection FAILED:', err.message);
-    console.error('   Make sure MySQL is running and your .env DB_* variables are correct.');
-    if (process.env.NODE_ENV === 'production') {
-      console.error('   Exiting – cannot serve API requests without a database.');
-      process.exit(1);
-    }
-    console.warn('   Server will continue running in development mode, but API calls will fail until the database is available.');
+    console.error('❌ Database initialization notice:', err.message);
+    console.warn('   Make sure MySQL is running and your .env DB_* variables are correct.');
   }
 });
+
