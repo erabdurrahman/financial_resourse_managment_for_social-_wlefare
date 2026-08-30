@@ -1,0 +1,13 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/:match*",
+      "destination": "https://financial-resourse-managment-for-social.onrender.com/api/:match*"
+    },
+    {
+      "source": "/uploads/:match*",
+      "destination": "https://financial-resourse-managment-for-social.onrender.com/uploads/:match*"
+    }
+  ]
+}
